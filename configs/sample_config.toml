@@ -1,0 +1,18 @@
+[pipeline]
+name = "financial_data_pipeline"
+log_file = "logs/financial_pipeline.log"
+
+[extract]
+class = "extract.csv_extractor.CSVExtractor"
+input_path = "data/*.csv"  # can be a directory or glob pattern
+
+[transform]
+class = "transform.example_transform.ExampleTransform"
+
+[load]
+class = "load.parquet_loader.ParquetLoader"
+output_dest = "output/"
+
+[validation]
+input_schema = "models.financial_models.FinancialInputModel"
+output_schema = "models.financial_models.FinancialOutputModel"

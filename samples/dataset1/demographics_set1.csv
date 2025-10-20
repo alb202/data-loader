@@ -1,0 +1,11 @@
+person_id,full_name,age,gender,address,city,state,zip_code
+101,Jack White,39,F,750 Birch Blvd,Springfield,IL,60301
+102,Frank Wilson,27,F,172 Elm Dr,Peoria,IA,60606
+103,Eva Brown,26,M,232 Maple St,Springfield,IA,63170
+106,Brian Smith,22,M,133 Elm Dr,Chicago,MO,60699
+107,Grace Lee,36,F,677 Maple St,Peoria,MO,65088
+108,Hector Garcia,52,F,474 Elm Dr,Chicago,WI,69331
+110,Alice Johnson,31,M,838 Elm Dr,Aurora,IA,60190
+111,David Chen,41,M,822 Maple St,Peoria,IL,60980
+113,Ivy Kim,41,F,188 Oak Ave,Aurora,MO,62975
+114,Carla Gomez,49,M,315 Maple St,Springfield,MO,66102
