@@ -43,28 +43,28 @@ def run_pipeline(
         if input_schema:
             logger.info("Validating input schema...")
             df = transformer.validate_input(df, input_schema)
-            logger.info("✅ Input validation passed")
+            logger.info("Input validation passed")
 
         # Transform
         df = transformer.transform(df)
-        logger.info("✅ Transformation complete")
+        logger.info("Transformation complete")
 
         # Validate output
         if output_schema:
             logger.info("Validating output schema...")
             df = transformer.validate_output(df, output_schema)
-            logger.info("✅ Output validation passed")
+            logger.info("Output validation passed")
 
         if dry_run:
             logger.info("Dry-run enabled: skipping data output.")
         else:
             loader.write(df, output_dest)
-            logger.info(f"✅ Data written to {output_dest}")
+            logger.info(f"Data written to {output_dest}")
 
         all_results.append(df)
 
     combined = pd.concat(all_results, ignore_index=True)
-    logger.info(f"📊 Combined total rows processed: {len(combined)}")
+    logger.info(f"Combined total rows processed: {len(combined)}")
     return combined
 
 
