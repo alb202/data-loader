@@ -6,9 +6,10 @@ import pandera as pa
 # from load.parquet_loader import ParquetLoader
 # from data_loader.extract.extract_base import Extract
 # from data_loader.transform.example_transform import Extract
-from data_loader.load.load_parquet import ParquetLoader
+# from data_loader.load.load_parquet import ParquetLoader
+from data_loader.logger.logging_utilties import setup_logger
+
 from data_loader.config.load_config import load_config
-from data_loader.logging.logging_utilties import setup_logger
 
 import argparse
 from pathlib import Path
@@ -88,14 +89,14 @@ def cli():
 
     # list command
     list_parser = subparsers.add_parser("list", help="List available TOML configs")
-    list_parser.add_argument("--dir", default=".", help="Directory to search for .toml files")
+    list_parser.add_argument("--dir", default="./configs/", help="Directory to search for .toml files")
 
     args = parser.parse_args()
 
     if args.command == "run":
         config_path = Path(args.config)
         if not config_path.exists():
-            print(f"❌ Config file not found: {config_path}")
+            print(f"Config file not found: {config_path}")
             return
 
         config = load_config(config_path)
@@ -105,7 +106,7 @@ def cli():
             log_file=config.get("log_file", log_file),
         )
 
-        logger.info(f"🚀 Starting pipeline: {config['pipeline_name']}")
+        logger.info(f"Starting pipeline: {config['pipeline_name']}")
         logger.info(f"Dry-run mode: {args.dry_run}")
 
         # Handle single or multiple input files
@@ -127,7 +128,7 @@ def cli():
             dry_run=args.dry_run,
         )
 
-        logger.info("🎉 Pipeline execution complete!")
+        logger.info("Pipeline execution complete!")
 
     elif args.command == "list":
         config_dir = Path(args.dir)
@@ -135,7 +136,7 @@ def cli():
         if not toml_files:
             print("No TOML configuration files found.")
         else:
-            print("📂 Available configurations:")
+            print("Available configurations:")
             for f in toml_files:
                 print(f"  - {f}")
 
