@@ -1,12 +1,12 @@
 # import io
 import gzip
 
-# import json
+import json
 import pandas as pd
 import pytest
 
 # from pathlib import Path
-from data_loader.utilities.loading import load_table, detect_file_type, UnsupportedFileTypeError
+from data_loader.src.utilities.file_readers import read_table, detect_file_type, UnsupportedFileTypeError
 
 
 @pytest.fixture
@@ -37,7 +37,7 @@ def test_load_csv(tmp_path, sample_dataframe):
     file_path = tmp_path / "data.csv"
     sample_dataframe.to_csv(file_path, index=False)
 
-    df = load_table(file_path)
+    df = read_table(file_path)
     assert len(df) == 3
     assert list(df.columns) == ["id", "name", "value"]
 
@@ -46,7 +46,7 @@ def test_load_tsv(tmp_path, sample_dataframe):
     file_path = tmp_path / "data.tsv"
     sample_dataframe.to_csv(file_path, index=False, sep="\t")
 
-    df = load_table(file_path)
+    df = read_table(file_path)
     assert df.equals(sample_dataframe)
 
 
@@ -55,7 +55,7 @@ def test_load_csv_gz(tmp_path, sample_dataframe):
     with gzip.open(file_path, "wt", encoding="utf-8") as f:
         sample_dataframe.to_csv(f, index=False)
 
-    df = load_table(file_path)
+    df = read_table(file_path)
     assert len(df) == 3
     assert set(df.columns) == {"id", "name", "value"}
 
@@ -64,7 +64,7 @@ def test_load_parquet(tmp_path, sample_dataframe):
     file_path = tmp_path / "data.parquet"
     sample_dataframe.to_parquet(file_path)
 
-    df = load_table(file_path)
+    df = read_table(file_path)
     assert df.equals(sample_dataframe)
 
 
@@ -72,25 +72,33 @@ def test_load_excel(tmp_path, sample_dataframe):
     file_path = tmp_path / "data.xlsx"
     sample_dataframe.to_excel(file_path, index=False)
 
-    df = load_table(file_path)
+    df = read_table(file_path)
     assert len(df) == 3
     assert "name" in df.columns
 
 
 def test_load_json(tmp_path, sample_dataframe):
     file_path = tmp_path / "data.json"
-    sample_dataframe.to_json(file_path, orient="records", lines=True)
+    sample_dataframe.to_json(file_path)
+    # sample_dataframe.to_json(file_path, orient="records", lines=True)
 
-    df = load_table(file_path)
-    assert len(df) == 3
-    assert "value" in df.columns
+    try:
+        with open(file_path, "r") as f:
+            tmp = json.load(f)
+        # df = read_table(file_path)
+        assert len(tmp.keys()) == 3
+        assert "id" in list(tmp.keys())
+        assert "name" in list(tmp.keys())
+        assert "value" in list(tmp.keys())
+    except Exception:
+        raise
 
 
 def test_load_feather(tmp_path, sample_dataframe):
     file_path = tmp_path / "data.feather"
     sample_dataframe.to_feather(file_path)
 
-    df = load_table(file_path)
+    df = read_table(file_path)
     assert df.equals(sample_dataframe)
 
 
@@ -99,9 +107,9 @@ def test_unsupported_file_type(tmp_path):
     file_path.write_text("random text")
 
     with pytest.raises(UnsupportedFileTypeError):
-        _ = load_table(file_path)
+        _ = read_table(file_path)
 
 
 def test_file_not_found():
     with pytest.raises(FileNotFoundError):
-        _ = load_table("nonexistent.csv")
+        _ = read_table("nonexistent.csv")

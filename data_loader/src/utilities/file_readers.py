@@ -16,20 +16,22 @@ def detect_file_type(file_path: Path) -> str:
 
     Returns
     -------
-    str : One of 'csv', 'tsv', 'excel', 'parquet'
+    str : One of 'csv', 'tsv', 'csv.gz', 'tsv.gz', 'excel', 'parquet', 'feather'
     """
 
-    ext = file_path.suffix.lower()
+    ext = "".join(file_path.suffixes).lower()
 
     # 1️⃣ Extension-based hints
-    if ext in [".csv"]:
+    if ext in [".csv", ".csv.gz"]:
         return "csv"
     if ext in [".tsv"]:
         return "tsv"
     if ext in [".xls", ".xlsx"]:
         return "excel"
-    if ext == ".parquet":
+    if ext in [".parquet"]:
         return "parquet"
+    if ext in [".feather"]:
+        return "feather"
 
     # 2️⃣ Content-based detection
     with open(file_path, "rb") as f:
@@ -59,16 +61,20 @@ def detect_file_type(file_path: Path) -> str:
             sample = f.read(2048)
             dialect = csv.Sniffer().sniff(sample)
             delim = dialect.delimiter
-            return "tsv" if delim == "\t" else "csv"
+            if delim == "\t":
+                return "tsv"
+            if delim == ",":
+                return "csv"
+            raise
     except Exception:
         pass
 
     raise UnsupportedFileTypeError(f"Could not determine file type for: {file_path}")
 
 
-def load_table(file_path: str | Path) -> pd.DataFrame:
+def read_table(file_path: str | Path) -> pd.DataFrame:
     """
-    Load a tabular file (CSV, TSV, Excel, or Parquet) into a pandas DataFrame.
+    Read a tabular file (CSV, TSV, Excel, Feather, or Parquet) into a pandas DataFrame.
     File type is detected automatically from both file extension and content.
 
     Parameters
@@ -105,6 +111,9 @@ def load_table(file_path: str | Path) -> pd.DataFrame:
 
     elif file_type == "parquet":
         return pd.read_parquet(path)
+
+    elif file_type == "feather":
+        return pd.read_feather(path)
 
     else:
         raise UnsupportedFileTypeError(f"Unsupported or unrecognized file type: {file_type}")
