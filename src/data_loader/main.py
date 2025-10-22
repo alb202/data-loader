@@ -7,9 +7,8 @@ import pandera as pa
 # from data_loader.extract.extract_base import Extract
 # from data_loader.transform.example_transform import Extract
 # from data_loader.load.load_parquet import ParquetLoader
-from data_loader.src.logger.logging_utilties import setup_logger
-
-from data_loader.src.config.load_config import load_config
+from data_loader.logger.logging_utilties import setup_logger
+from data_loader.config.load_config import load_config
 
 import argparse
 from pathlib import Path

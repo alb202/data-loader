@@ -1,0 +1,21 @@
+cust_id,first_name,last_name,birth_year,sex,address_line,postal_code,country
+P-001,Alice,Johnson,1971,Female,"586 Maple St, Peoria, IL",69874,USA
+P-002,Brian,Smith,1982,Male,"697 Oak Ave, Aurora, IA",64752,USA
+P-003,Carla,Gomez,1974,Male,"305 Oak Ave, Naperville, IL",68311,USA
+P-004,David,Chen,1987,Female,"349 Oak Ave, Chicago, MO",60830,USA
+P-005,Eva,Brown,1993,Female,"900 Elm Dr, Chicago, IN",65177,USA
+P-006,Frank,Wilson,1961,Male,"720 Maple St, Chicago, IL",69561,USA
+P-007,Grace,Lee,1991,Female,"956 Maple St, Naperville, IN",68932,USA
+P-008,Hector,Garcia,1982,Female,"737 Elm Dr, Naperville, WI",68308,USA
+P-009,Ivy,Kim,1981,Female,"405 Pine Rd, Peoria, IA",65949,USA
+P-010,Jack,White,1984,Male,"406 Birch Blvd, Aurora, IL",62838,USA
+P-011,Karen,Davis,1981,Male,"288 Birch Blvd, Peoria, IN",61150,USA
+P-012,Leo,Lopez,1981,Male,"151 Maple St, Aurora, IA",67560,USA
+P-013,Maria,Clark,2001,Female,"570 Oak Ave, Chicago, MO",61931,USA
+P-014,Nina,Hall,1965,Female,"216 Elm Dr, Aurora, IA",69204,USA
+P-015,Oscar,King,1974,Female,"610 Pine Rd, Chicago, IA",61664,USA
+P-016,Paula,Young,2002,Male,"408 Birch Blvd, Springfield, WI",61081,USA
+P-017,Quinn,Allen,1996,Female,"310 Pine Rd, Springfield, IN",60512,USA
+P-018,Rosa,Wright,1992,Female,"247 Elm Dr, Naperville, IL",67805,USA
+P-019,Steve,Scott,1967,Female,"487 Pine Rd, Springfield, IN",65237,USA
+P-020,Tina,Green,2003,Female,"586 Birch Blvd, Chicago, WI",60559,USA

@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 # from pathlib import Path
-from data_loader.src.utilities.file_readers import read_table, detect_file_type, UnsupportedFileTypeError
+from data_loader.utilities.file_readers import read_table, detect_file_type, UnsupportedFileTypeError
 
 
 @pytest.fixture

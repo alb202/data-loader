@@ -1,6 +1,6 @@
 import pandera.pandas as pa
 from pandera.typing import Series
-from data_loader.src.models.models_base import BaseModel
+from data_loader.models.models_base import BaseModel
 
 
 class FinancialInputModel(BaseModel):
