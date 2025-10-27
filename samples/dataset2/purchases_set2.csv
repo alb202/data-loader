@@ -1,51 +1,51 @@
 cust_id,day,month,year,item_name,sku,cost,currency,purchase_channel
 P-008,3,7,2024,USB Type-C Cable,A123,276.56,USD,Online
-P-013,1,5,2025,Desk Lamp,F111,34.0,USD,Online
+P-013,1,5,2023,Desk Lamp,F111,34.0,USD,Online
 P-001,1,12,2024,Headphones,G999,264.23,USD,Online
-P-016,8,1,2025,USB Type-C Cable,G999,169.96,USD,Store
+P-016,8,1,2023,USB Type-C Cable,G999,169.96,USD,Store
 P-007,10,7,2024,"Display 27""",A123,57.8,USD,Store
-P-005,11,7,2025,"Display 27""",E333,129.26,USD,Store
-P-003,12,9,2025,Laptop Stand,F111,235.5,USD,Store
-P-012,13,3,2025,Mech Keyboard,F111,149.31,USD,Store
+P-005,11,7,2023,"Display 27""",E333,129.26,USD,Store
+P-003,12,9,2023,Laptop Stand,F111,235.5,USD,Store
+P-012,13,3,2023,Mech Keyboard,F111,149.31,USD,Store
 P-016,12,9,2024,Headphones,C789,295.73,USD,Store
 P-019,14,1,2024,Laptop Stand,G999,119.25,USD,Store
-P-005,2,1,2025,Mech Keyboard,A123,227.38,USD,Store
+P-005,2,1,2023,Mech Keyboard,A123,227.38,USD,Store
 P-014,19,4,2024,Mech Keyboard,C789,123.97,USD,Store
-P-005,18,9,2025,"Display 27""",D222,250.46,USD,Online
+P-005,18,9,2023,"Display 27""",D222,250.46,USD,Online
 P-015,3,6,2024,Desk Lamp,B456,175.03,USD,Online
-P-017,23,11,2025,Wireless Mouse,F111,28.42,USD,Online
-P-014,17,3,2025,Desk Lamp,D222,20.68,USD,Online
+P-017,23,11,2023,Wireless Mouse,F111,28.42,USD,Online
+P-014,17,3,2023,Desk Lamp,D222,20.68,USD,Online
 P-020,26,1,2024,Wireless Mouse,D222,48.82,USD,Store
-P-005,8,4,2025,USB Type-C Cable,E333,13.96,USD,Store
+P-005,8,4,2023,USB Type-C Cable,E333,13.96,USD,Store
 P-012,26,12,2024,"Display 27""",B456,31.85,USD,Online
-P-016,10,9,2025,Mech Keyboard,D222,210.6,USD,Store
-P-016,26,3,2025,Headphones,D222,164.96,USD,Online
+P-016,10,9,2023,Mech Keyboard,D222,210.6,USD,Store
+P-016,26,3,2023,Headphones,D222,164.96,USD,Online
 P-007,2,12,2024,Wireless Mouse,B456,227.47,USD,Store
 P-004,19,9,2024,Desk Lamp,B456,274.82,USD,Online
 P-001,9,7,2024,Mech Keyboard,D222,179.69,USD,Store
-P-005,7,12,2025,Wireless Mouse,B456,220.58,USD,Store
+P-005,7,12,2023,Wireless Mouse,B456,220.58,USD,Store
 P-010,4,4,2024,Wireless Mouse,D222,229.55,USD,Online
-P-005,26,3,2025,Wireless Mouse,D222,119.58,USD,Store
-P-004,21,10,2025,Headphones,E333,79.91,USD,Online
+P-005,26,3,2023,Wireless Mouse,D222,119.58,USD,Store
+P-004,21,10,2023,Headphones,E333,79.91,USD,Online
 P-002,18,5,2024,"Display 27""",A123,69.46,USD,Online
 P-020,13,5,2024,Headphones,D222,82.92,USD,Online
-P-010,11,3,2025,Laptop Stand,C789,89.67,USD,Online
-P-019,24,12,2025,Mech Keyboard,F111,70.1,USD,Store
+P-010,11,3,2023,Laptop Stand,C789,89.67,USD,Online
+P-019,24,12,2023,Mech Keyboard,F111,70.1,USD,Store
 P-001,4,9,2024,"Display 27""",G999,264.68,USD,Store
 P-005,25,4,2024,"Display 27""",A123,229.53,USD,Store
 P-013,21,11,2024,"Display 27""",A123,23.6,USD,Online
 P-004,25,5,2024,Desk Lamp,A123,87.92,USD,Store
 P-016,4,4,2024,"Display 27""",E333,16.43,USD,Online
-P-016,10,5,2025,Headphones,D222,154.47,USD,Store
-P-002,5,7,2025,"Display 27""",E333,148.1,USD,Store
-P-017,9,9,2025,USB Type-C Cable,D222,251.1,USD,Store
-P-020,24,7,2025,Mech Keyboard,E333,99.26,USD,Online
+P-016,10,5,2023,Headphones,D222,154.47,USD,Store
+P-002,5,7,2023,"Display 27""",E333,148.1,USD,Store
+P-017,9,9,2023,USB Type-C Cable,D222,251.1,USD,Store
+P-020,24,7,2023,Mech Keyboard,E333,99.26,USD,Online
 P-012,3,5,2024,"Display 27""",E333,246.75,USD,Store
 P-018,17,10,2024,Mech Keyboard,F111,290.71,USD,Store
 P-003,3,10,2024,USB Type-C Cable,C789,35.64,USD,Online
-P-001,16,7,2025,USB Type-C Cable,E333,239.63,USD,Store
-P-001,4,10,2025,Mech Keyboard,F111,181.09,USD,Online
+P-001,16,7,2023,USB Type-C Cable,E333,239.63,USD,Store
+P-001,4,10,2023,Mech Keyboard,F111,181.09,USD,Online
 P-019,18,5,2024,Wireless Mouse,B456,149.21,USD,Store
 P-011,17,3,2024,Laptop Stand,C789,131.96,USD,Online
-P-005,7,7,2025,Desk Lamp,E333,237.55,USD,Online
-P-012,24,11,2025,Wireless Mouse,G999,195.41,USD,Store
+P-005,7,7,2023,Desk Lamp,E333,237.55,USD,Online
+P-012,24,11,2023,Wireless Mouse,G999,195.41,USD,Store
