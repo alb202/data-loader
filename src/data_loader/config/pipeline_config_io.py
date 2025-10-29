@@ -1,4 +1,4 @@
-from src.data_loader.models.pipeline_config_model import PipelineConfig, PipelineDetails, OutputTable, InputFile
+from models.pipeline_config_model import PipelineConfig, PipelineDetails, OutputTable, InputFile
 
 import toml
 from pathlib import Path
