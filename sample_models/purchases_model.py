@@ -6,7 +6,7 @@ check_currencies = ["USD", "EUR"]
 check_purchase_location = ["online", "store"]
 
 
-purchases_schema = DataFrameSchema(
+schema = DataFrameSchema(
     columns={
         "customer_id": Column(
             dtype=str,

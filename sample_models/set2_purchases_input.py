@@ -1,7 +1,7 @@
 from pandera.pandas import DataFrameSchema, Column, Check
 # from datetime import datetime
 
-purchases2_schema = DataFrameSchema(
+schema = DataFrameSchema(
     columns={
         "cust_id": Column(
             dtype=str,

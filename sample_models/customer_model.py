@@ -58,7 +58,7 @@ check_states = state_abbreviations = [
 ]
 
 
-customer_schema = DataFrameSchema(
+schema = DataFrameSchema(
     columns={
         "customer_id": Column(
             dtype=str,
