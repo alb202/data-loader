@@ -1,0 +1,15 @@
+[[extract_files]]
+folder = "/Users/ab/Projects/data-loader/samples/dataset2/"
+file_name = "purchases_set2.csv"
+schema_name = "set2_purchases_input"
+label = "Purchases file"
+
+[details]
+name = "set2_purchases_pipeline"
+description = "Transform purchase data from sample set 2 for purchases table"
+transformer_pipeline = "set2_purchase_transformer"
+
+[output_table]
+table_name = "purchases"
+schema_name = "purchases_model"
+db = "Purchases"

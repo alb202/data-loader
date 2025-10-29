@@ -1,15 +1,15 @@
 [[extract_files]]
 folder = "/Users/ab/Projects/data-loader/samples/dataset2/"
 file_name = "customers_set2.csv"
-schema_name = "Dataset2Customers"
+schema_name = "set2_customer_input"
 label = "Customer file"
 
 [details]
-name = "Customer1_pipeline"
-description = "Transform customer data for customers table"
-transformer_pipeline = "dataset_2_customers"
+name = "set2_customer_pipeline"
+description = "Transform customer data from sample set 2 for customers table"
+transformer_pipeline = "set2_customer_transformer"
 
 [output_table]
 table_name = "customers"
-schema_name = "CustomerTable"
+schema_name = "customer_model"
 db = "Purchases"
