@@ -1,12 +1,12 @@
+# from pathlib import Path
+from src.data_loader.utilities.file_readers import read_table, detect_file_type, UnsupportedFileTypeError
+
 # import io
 import gzip
 
 import json
 import pandas as pd
 import pytest
-
-# from pathlib import Path
-from data_loader.utilities.file_readers import read_table, detect_file_type, UnsupportedFileTypeError
 
 
 @pytest.fixture
