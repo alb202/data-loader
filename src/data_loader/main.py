@@ -8,7 +8,9 @@ from pathlib import Path
 # from data_loader.transform.example_transform import Extract
 # from data_loader.load.load_parquet import ParquetLoader
 from logger.logging_utilties import setup_logger, get_timestamp
-from src.data_loader.config.pipeline_config_io import load_pipeline_config  # , #load_config
+from config.pipeline_config_io import load_pipeline_config  # , #load_config
+from extract.read_data import read_input_data
+from utilities.object_loader import load_object_from_file
 
 # from src.data_loader.
 import argparse
@@ -50,9 +52,39 @@ def run_pipeline(
         logger.exception(msg)
         raise ValueError(msg)
 
-    logger.info(f"Pipeline name: {config_dict.name}")
-    logger.info(f"Pipeline description: {config_dict.description}")
+    logger.info(f"Pipeline name: {config_dict.details.name}")
+    logger.info(f"Pipeline description: {config_dict.details.description}")
     logger.info(f"Dry-run mode: {dry_run}")
+
+    # Extract
+
+    extract_files: list = []
+    for file_number, extract_file in enumerate(config_dict.extract_files):
+        data = read_input_data(folder=extract_file.folder, file_name=extract_file.file_name)
+        logger.info(f"File {file_number}: {extract_file.file_name} has been loaded")
+
+        schema = load_object_from_file(
+            folder_name=Path("sample_models/").resolve(), file_name=extract_file.schema_name + ".py", object_name="schema"
+        )
+        logger.info(f"Schema {file_number}: {extract_file.schema_name} has been loaded")
+
+        validated_data = schema.validate(data)
+        logger.info(f"Data '{extract_file.label}' has been validated")
+
+        extract_files.append(
+            {
+                "label": extract_file.label,
+                "schema": schema,
+                "data": validated_data,
+            }
+        )
+
+    print(extract_files)
+
+    # Transform
+
+
+
 
     """ Try to find a way to import the list of available transformation modules """
 
@@ -119,7 +151,7 @@ def cli():
 
     # list command
     list_parser = subparsers.add_parser("list", help="List available TOML configs")
-    list_parser.add_argument("--dir", required=False, default="../../sample_configs/", help="Directory to search for .toml files")
+    list_parser.add_argument("--dir", required=False, default="sample_configs/", help="Directory to search for .toml files")
 
     args = parser.parse_args()
 
@@ -161,7 +193,7 @@ def cli():
         # logger.info("Pipeline execution complete!")
 
     elif args.command == "list":
-        config_dir = Path(args.dir)
+        config_dir = Path(args.dir).resolve()
         toml_files = list(config_dir.glob("*.toml"))
         if not toml_files:
             print("No TOML configuration files found.")
