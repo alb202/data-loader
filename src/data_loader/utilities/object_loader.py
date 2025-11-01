@@ -7,7 +7,7 @@ from pathlib import Path
 
 def load_object_from_file(folder_name: Path, file_name: str, object_name: str) -> Any:
     """
-    Dynamically loads an object (e.g., 'schema') from a Python file at runtime.
+    Dynamically loads an object (e.g., schema or class) from a Python file at runtime.
 
     Parameters
     ----------
@@ -28,17 +28,17 @@ def load_object_from_file(folder_name: Path, file_name: str, object_name: str) -
     AttributeError
         If the specified object is not found in the module.
     """
-    file_path = folder_name / file_name
+    file_path: Path = folder_name / file_name
 
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
 
-    module_name = os.path.splitext(os.path.basename(file_path))[0]
+    module_name: str = os.path.splitext(os.path.basename(file_path))[0]
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     if spec is None or spec.loader is None:
         raise ImportError(f"Cannot import from {file_path}")
 
-    module = importlib.util.module_from_spec(spec)
+    module: ModuleType = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)  # type: ignore
 
     if not hasattr(module, object_name):

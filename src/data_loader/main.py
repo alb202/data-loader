@@ -12,7 +12,8 @@ from config.pipeline_config_io import load_pipeline_config  # , #load_config
 from extract.read_data import read_input_data
 from utilities.object_loader import load_object_from_file
 from models.extract_pipeline_data_model import ExtractPipelineData
-from utilities.class_loader import load_class_from_file  # DynamicClassLoader, load_class,
+
+# from utilities.class_loader import load_class_from_file  # DynamicClassLoader, load_class,
 from data_writer.writer import DataFrameWriter  # , DataFrameWriterRegistry
 
 # from src.data_loader.
@@ -23,6 +24,13 @@ import argparse
 
 
 SAVE_METHODS = ["parquet", "duckdb", "sqlite"]
+
+DEFAULT_PATHS = {
+    "logs": "../../logs/",
+    "models": "sample_models/",
+    "transformers": "src/data_loader/transform/implementations/",
+    "output": "sample_output/",
+}
 
 
 def run_pipeline(
@@ -47,7 +55,9 @@ def run_pipeline(
 
     # log_file = config["name"] + ".log"
 
-    logger = setup_logger(log_file=Path("../../logs/").resolve() / f"log_file__{get_timestamp()}")
+    logger = setup_logger(log_file=Path(DEFAULT_PATHS.get("logs")).resolve() / f"log_file__{get_timestamp()}", name="Logger")
+
+    logger.info("Logging started")
 
     try:
         config_dict = load_pipeline_config(path=Path(config))
@@ -71,7 +81,7 @@ def run_pipeline(
         logger.info(f"File {file_number}: {extract_file.file_name} has been loaded")
 
         schema = load_object_from_file(
-            folder_name=Path("sample_models/").resolve(), file_name=extract_file.schema_name + ".py", object_name="schema"
+            folder_name=Path(DEFAULT_PATHS.get("models")).resolve(), file_name=extract_file.schema_name + ".py", object_name="schema"
         )
         logger.info(f"Schema {file_number}: {extract_file.schema_name} has been loaded")
 
@@ -80,28 +90,44 @@ def run_pipeline(
 
         extract_files.append(ExtractPipelineData(label=extract_file.label, schema=schema, data=validated_data))
 
-    print(extract_files)
+    # print(extract_files)
 
     # Transform
 
-    print("transformer_pipeline", "src/data_loader/transform/" + config_dict.details.transformer_pipeline + ".py")
+    # print("transformer_pipeline", "src/data_loader/transform/" + config_dict.details.transformer_pipeline + ".py")
 
-    load_schema_from_file: dict = dict(
-        filepath="sample_models/" + config_dict.output_table.schema_name + ".py",
-        class_name="schema",
-        package_root="/Users/ab/Projects/data-loader/",
+    # print("package root", Path("./").resolve())
+
+    # load_schema_from_file: dict = dict(
+    #     filepath="sample_models/" + config_dict.output_table.schema_name + ".py",
+    #     class_name="schema",
+    #     package_root=Path(".").resolve(),  # .as_posix(),  # "/Users/ab/Projects/data-loader/",
+    #     # package_root="/Users/ab/Projects/data-loader/",
+    # )
+    # load_transformer_from_file: dict = dict(
+    #     filepath="src/data_loader/transform/" + config_dict.details.transformer_pipeline + ".py",
+    #     class_name="Transformer",
+    #     package_root=Path(".").resolve(),  # .as_posix(),  # "/Users/ab/Projects/data-loader/",
+    #     # package_root="/Users/ab/Projects/data-loader/",
+    # )
+
+    # print("load_schema_from_file", load_schema_from_file)
+    # print("load_transformer_from_file", load_transformer_from_file)
+
+    # output_schema = load_class_from_file(**load_schema_from_file)
+    # transformer_class = load_class_from_file(**load_transformer_from_file)
+
+    output_schema = load_object_from_file(
+        folder_name=Path(DEFAULT_PATHS.get("models")).resolve(),
+        file_name=config_dict.output_table.schema_name + ".py",
+        object_name="schema",
     )
-    load_transformer_from_file: dict = dict(
-        filepath="src/data_loader/transform/" + config_dict.details.transformer_pipeline + ".py",
-        class_name="Transformer",
-        package_root="/Users/ab/Projects/data-loader/",
+    transformer_class = load_object_from_file(
+        folder_name=Path(DEFAULT_PATHS.get("transformers")).resolve(),
+        file_name=config_dict.details.transformer_pipeline + ".py",
+        object_name="Transformer",
     )
 
-    print("load_schema_from_file", load_schema_from_file)
-    print("load_transformer_from_file", load_transformer_from_file)
-
-    output_schema = load_class_from_file(**load_schema_from_file)
-    transformer_class = load_class_from_file(**load_transformer_from_file)
     #     folder_path="src/data_loader/transform/", file_name=config_dict.details.transformer_pipeline, class_name="transform"
     # )
     # transformer_class.transform()
@@ -116,14 +142,14 @@ def run_pipeline(
     # Load
 
     logger.info(f"Saving data to disk with method: {save_method}")
-    logger.info(f"Output location: {'sample_output/'}")
+    logger.info(f"Output location: {DEFAULT_PATHS.get('output')}")
     logger.info(f"Database: {config_dict.output_table.db}")
     logger.info(f"Table name: {config_dict.output_table.table_name}")
 
     if not dry_run:
         DataFrameWriter(
             df=transformed_df.assign(data_label=config_dict.output_table.data_label),
-            output_path=Path("sample_output/").resolve(),
+            output_path=Path(DEFAULT_PATHS.get("output")).resolve(),
             write_method=save_method,
             table_name=config_dict.output_table.table_name,
             db=config_dict.output_table.db,

@@ -2,7 +2,7 @@ from pandas import DataFrame
 from pandera.pandas import DataFrameSchema
 
 # from src.data_loader.transform.transform_base import Transform
-from src.data_loader.transform.transform_base import Transform
+from transform.transform_base import Transform
 
 
 class Transformer(Transform):

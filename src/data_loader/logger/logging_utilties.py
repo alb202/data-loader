@@ -7,9 +7,9 @@ def get_timestamp() -> str:
     return datetime.datetime.now().strftime(format="%Y_%m_%d__%H_%M_%S")
 
 
-def setup_logger(log_file: str | None = None, level=logging.INFO):
+def setup_logger(log_file: str | None = None, level: int = logging.INFO, name: str = "logger"):
     """Set up a simple structured logger."""
-    logger = logging.getLogger("data_pipeline")
+    logger: logging.Logger = logging.getLogger(name)
     logger.setLevel(level)
 
     # Avoid duplicate handlers in re-runs
