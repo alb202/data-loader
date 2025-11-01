@@ -6,7 +6,8 @@ from typing import Protocol
 class Transform(Protocol):
     """Protocol for transformation classes."""
 
-    def transform(self, *dfs: DataFrame, output_schema: DataFrameSchema) -> DataFrame:
+    @classmethod
+    def transform(cls, *dfs: DataFrame, output_schema: DataFrameSchema) -> DataFrame:
         """Apply custom transformation logic."""
         ...
 

@@ -11,12 +11,18 @@ from logger.logging_utilties import setup_logger, get_timestamp
 from config.pipeline_config_io import load_pipeline_config  # , #load_config
 from extract.read_data import read_input_data
 from utilities.object_loader import load_object_from_file
+from models.extract_pipeline_data_model import ExtractPipelineData
+from utilities.class_loader import load_class_from_file  # DynamicClassLoader, load_class,
+from load.writer import DataFrameWriter  # , DataFrameWriterRegistry
 
 # from src.data_loader.
 import argparse
 # from pathlib import Path
 # import glob
 # import pandas as pd
+
+
+SAVE_METHODS = ["parquet", "duckdb", "sqlite"]
 
 
 def run_pipeline(
@@ -30,6 +36,7 @@ def run_pipeline(
     # input_schema=None,
     # output_schema=None,
     dry_run=False,
+    save_method: str = "parquet",
 ) -> None:
     # Handle single or multiple input files
     # input_pattern = config["input_path"]
@@ -71,23 +78,61 @@ def run_pipeline(
         validated_data = schema.validate(data)
         logger.info(f"Data '{extract_file.label}' has been validated")
 
-        extract_files.append(
-            {
-                "label": extract_file.label,
-                "schema": schema,
-                "data": validated_data,
-            }
-        )
+        extract_files.append(ExtractPipelineData(label=extract_file.label, schema=schema, data=validated_data))
 
     print(extract_files)
 
     # Transform
 
+    print("transformer_pipeline", "src/data_loader/transform/" + config_dict.details.transformer_pipeline + ".py")
 
+    load_schema_from_file: dict = dict(
+        filepath="sample_models/" + config_dict.output_table.schema_name + ".py",
+        class_name="schema",
+        package_root="/Users/ab/Projects/data-loader/",
+    )
+    load_transformer_from_file: dict = dict(
+        filepath="src/data_loader/transform/" + config_dict.details.transformer_pipeline + ".py",
+        class_name="Transformer",
+        package_root="/Users/ab/Projects/data-loader/",
+    )
 
+    print("load_schema_from_file", load_schema_from_file)
+    print("load_transformer_from_file", load_transformer_from_file)
 
-    """ Try to find a way to import the list of available transformation modules """
+    output_schema = load_class_from_file(**load_schema_from_file)
+    transformer_class = load_class_from_file(**load_transformer_from_file)
+    #     folder_path="src/data_loader/transform/", file_name=config_dict.details.transformer_pipeline, class_name="transform"
+    # )
+    # transformer_class.transform()
 
+    # transformer_class = DynamicClassLoader(
+    #     folder_path="src/data_loader/transform/", file_name=config_dict.details.transformer_pipeline, class_name="transform"
+    # )
+    transformed_df = transformer_class.transform(*[extract_file.data for extract_file in extract_files], schema=output_schema)
+    print(transformed_df)
+
+    # Load
+
+    logger.info(f"Saving data to disk with method: {save_method}")
+    logger.info(f"Output location: {'sample_output/'}")
+    logger.info(f"Database: {config_dict.output_table.db}")
+    logger.info(f"Table name: {config_dict.output_table.table_name}")
+
+    if not dry_run:
+        DataFrameWriter(
+            df=transformed_df.assign(data_label=config_dict.output_table.data_label),
+            output_path=Path("sample_output/"),
+            write_method=save_method,
+            table_name=config_dict.output_table.table_name,
+            db=config_dict.output_table.db,
+            mode="overwrite",
+            validate=False,
+            partition_cols=["data_label"],
+            schema=None,
+        ).write()
+    else:
+        logger.info("Dry-run selected. No data written.")
     logger.info("Pipeline execution complete!")
 
     # """Core ETL pipeline execution logic."""
@@ -139,6 +184,7 @@ def cli():
     # run command
     run_parser = subparsers.add_parser("run", help="Run a pipeline")
     run_parser.add_argument("--config", required=True, help="Path to the TOML config")
+    run_parser.add_argument("--save_method", required=False, default="parquet", choices=SAVE_METHODS, help="Method for saving data")
     run_parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -180,6 +226,7 @@ def cli():
 
         run_pipeline(
             config=args.config,
+            save_method=args.save_method,
             # output_dest=config["output_dest"],
             # extractor_cls=config["extractor_cls"],
             # transformer_cls=config["transformer_cls"],

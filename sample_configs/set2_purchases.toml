@@ -7,9 +7,10 @@ label = "Purchases file"
 [details]
 name = "set2_purchases_pipeline"
 description = "Transform purchase data from sample set 2 for purchases table"
-transformer_pipeline = "set2_purchase_transformer"
+transformer_pipeline = "set2_purchases_transformer"
 
 [output_table]
 table_name = "purchases"
 schema_name = "purchases_model"
 db = "Purchases"
+data_label = "Set2"

@@ -22,6 +22,7 @@ class OutputTable:
     table_name: str
     schema_name: str
     db: str
+    data_label: str
 
 
 @dataclass
