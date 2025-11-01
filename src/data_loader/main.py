@@ -13,7 +13,7 @@ from extract.read_data import read_input_data
 from utilities.object_loader import load_object_from_file
 from models.extract_pipeline_data_model import ExtractPipelineData
 from utilities.class_loader import load_class_from_file  # DynamicClassLoader, load_class,
-from load.writer import DataFrameWriter  # , DataFrameWriterRegistry
+from data_writer.writer import DataFrameWriter  # , DataFrameWriterRegistry
 
 # from src.data_loader.
 import argparse
@@ -50,7 +50,7 @@ def run_pipeline(
     logger = setup_logger(log_file=Path("../../logs/").resolve() / f"log_file__{get_timestamp()}")
 
     try:
-        config_dict = load_pipeline_config(config)
+        config_dict = load_pipeline_config(path=Path(config))
         logger.info("Configuration file successfully loaded.")
         logger.info(config_dict)
     except Exception as e:
@@ -109,8 +109,9 @@ def run_pipeline(
     # transformer_class = DynamicClassLoader(
     #     folder_path="src/data_loader/transform/", file_name=config_dict.details.transformer_pipeline, class_name="transform"
     # )
-    transformed_df = transformer_class.transform(*[extract_file.data for extract_file in extract_files], schema=output_schema)
-    print(transformed_df)
+    transformed_df = transformer_class.transform(*[extract_file.data for extract_file in extract_files], output_schema=output_schema)
+    transformer_class.validate_output(df=transformed_df, output_schema=output_schema)
+    # print(transformed_df)
 
     # Load
 
@@ -122,14 +123,14 @@ def run_pipeline(
     if not dry_run:
         DataFrameWriter(
             df=transformed_df.assign(data_label=config_dict.output_table.data_label),
-            output_path=Path("sample_output/"),
+            output_path=Path("sample_output/").resolve(),
             write_method=save_method,
             table_name=config_dict.output_table.table_name,
             db=config_dict.output_table.db,
             mode="overwrite",
-            validate=False,
+            # validate=False,
             partition_cols=["data_label"],
-            schema=None,
+            # schema=None,
         ).write()
     else:
         logger.info("Dry-run selected. No data written.")

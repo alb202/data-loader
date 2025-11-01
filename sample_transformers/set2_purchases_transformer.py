@@ -1,11 +1,15 @@
 from pandas import DataFrame, to_datetime
 from pandera.pandas import DataFrameSchema
+from datetime import datetime
 
 from src.data_loader.transform.transform_base import Transform
 
 
 class Transformer(Transform):
-    def transformer(*dfs: DataFrame, schema: DataFrameSchema) -> DataFrame:
+    """Implementation of transformer class"""
+
+    @classmethod
+    def transform(cls, *dfs: DataFrame, schema: DataFrameSchema) -> DataFrame:
         # Make a copy of the dataframe
         df_final = dfs[0].copy(deep=True)
 

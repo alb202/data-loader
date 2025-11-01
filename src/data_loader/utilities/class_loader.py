@@ -10,25 +10,27 @@ from importlib.machinery import ModuleSpec
 from types import ModuleType
 import sys
 import os
+
 # import types
 # import time
 from pathlib import Path
 from utilities.read_utilities import validate_file, validate_path
 
+
 def load_class_from_file(filepath: str, class_name: str, package_root: str | None = None):
     # Example: filepath="plugins/myplugin/module.py"
-    module_name = os.path.splitext(os.path.basename(filepath))[0]
-    
+    module_name: str = os.path.splitext(os.path.basename(filepath))[0]
+
     # Optional: if inside a package, define a package path
     if package_root:
-        package_name = os.path.basename(package_root)
-        full_module_name = f"{package_name}.{module_name}"
+        package_name: str = os.path.basename(package_root)
+        full_module_name: str = f"{package_name}.{module_name}"
         sys.path.insert(0, os.path.dirname(package_root))
     else:
-        full_module_name = module_name
+        full_module_name: str = module_name
 
-    spec = importlib.util.spec_from_file_location(full_module_name, filepath)
-    module = importlib.util.module_from_spec(spec)
+    spec: ModuleSpec = importlib.util.spec_from_file_location(full_module_name, filepath)
+    module: ModuleType = importlib.util.module_from_spec(spec)
     sys.modules[full_module_name] = module
     spec.loader.exec_module(module)
     return getattr(module, class_name)
@@ -39,8 +41,9 @@ def load_class(full_class_path: str):
     Load a class dynamically, given a full dotted path like:
         'myproject.package.mymodule.MyClass'
     """
-    module_path, class_name = full_class_path.rsplit(".", 1)
-    module = importlib.import_module(module_path)
+    module_path: str = full_class_path.rsplit(".", 1)[0]
+    class_name: str = full_class_path.rsplit(".", 1)[1]
+    module: ModuleType = importlib.import_module(module_path)
     return getattr(module, class_name)
 
 
@@ -55,7 +58,7 @@ class DynamicClassLoader:
         self._class = None
         self._load_module()
 
-    def _load_module(self):
+    def _load_module(self) -> None:
         """Load or reload the module from file."""
         spec: ModuleSpec = importlib.util.spec_from_file_location(
             "transformer_file",

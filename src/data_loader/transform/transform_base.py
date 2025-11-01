@@ -6,23 +6,29 @@ from typing import Protocol
 class Transform(Protocol):
     """Protocol for transformation classes."""
 
-    @classmethod
-    def transform(cls, *dfs: DataFrame, output_schema: DataFrameSchema) -> DataFrame:
+    @staticmethod
+    def transform(
+        # cls,
+        *dfs: DataFrame,
+        output_schema: DataFrameSchema,
+    ) -> DataFrame:
         """Apply custom transformation logic."""
         ...
 
+    @staticmethod
     def validate_input(
-        self,
+        # self,
         df: DataFrame,
-        schema: DataFrameSchema,
+        input_schema: DataFrameSchema,
     ) -> DataFrame:
         """Validate input DataFrame."""
-        return schema.validate(df)
+        return input_schema.validate(df)
 
+    @staticmethod
     def validate_output(
-        self,
+        # self,
         df: DataFrame,
-        schema: DataFrameSchema,
+        output_schema: DataFrameSchema,
     ) -> DataFrame:
         """Validate output DataFrame."""
-        return schema.validate(df)
+        return output_schema.validate(df)

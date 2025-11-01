@@ -1,4 +1,4 @@
-from pandas import DataFrame
+from pandas import DataFrame, to_datetime
 from pandera.pandas import DataFrameSchema
 from datetime import datetime
 
@@ -6,7 +6,10 @@ from src.data_loader.transform.transform_base import Transform
 
 
 class Transformer(Transform):
-    def transform(self, *dfs: DataFrame, schema: DataFrameSchema) -> DataFrame:
+    """Implementation of transformer class"""
+
+    @classmethod
+    def transform(cls, *dfs: DataFrame, schema: DataFrameSchema) -> DataFrame:
         # Make a copy of the dataframe
         df_final = dfs[0].copy(deep=True)
 
@@ -32,7 +35,7 @@ class Transformer(Transform):
         df_final["customer_id"] = df_final["customer_id"].apply(lambda customer_id: customer_id.replace("P-", ""))
 
         # Calculate the age
-        df_final["age"] = df_final["birth_year"].apply(lambda birth_year: int(datetime.now().year - birth_year))
+        df_final["age"] = df_final["birth_year"].apply(lambda birth_year: int(datetime.now().year - int(birth_year)))
 
         # Reformat the sex string
         df_final["sex"] = df_final["sex"].map({"Male": "M", "Female": "F"})

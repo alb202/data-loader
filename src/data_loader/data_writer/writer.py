@@ -2,12 +2,10 @@
 # import sys
 import duckdb
 import sqlite3
-import pandas as pd
+from pandas import DataFrame
 from pathlib import Path
 from typing import Optional, Union, Literal, Callable, Dict
 
-# import pandera as pa
-from pandera import DataFrameSchema
 
 # try:
 #     import pandera as pa
@@ -58,27 +56,27 @@ class DataFrameWriter:
 
     def __init__(
         self,
-        df: pd.DataFrame,
+        df: DataFrame,
         output_path: Union[str, Path],
         write_method: str,
         db: str,
-        table_name: Optional[str] = None,
+        table_name: str,
         partition_cols: Optional[list[str]] = None,
-        schema: Optional[DataFrameSchema] = None,
+        # schema: DataFrameSchema = None,
         mode: Literal["overwrite", "append"] = "overwrite",
-        validate: bool = True,
-        **kwargs,
+        # validate: bool = True,
+        # **kwargs,
     ):
-        self.df = df
-        self.output_path = Path(output_path)
-        self.write_method = write_method.lower()
-        self.table_name = table_name
-        self.db = db
-        self.partition_cols = partition_cols or []
-        self.schema = schema
-        self.mode = mode
-        self.validate = validate
-        self.kwargs = kwargs
+        self.df: DataFrame = df
+        self.output_path: Path = Path(output_path)
+        self.write_method: str = write_method
+        self.table_name: str = table_name
+        self.db: str = db
+        self.partition_cols: list[str] = partition_cols or []
+        # self.schema = schema
+        self.mode: str = mode
+        # self.validate = validate
+        # self.kwargs = kwargs
 
         # Create output directories if needed
         if self.write_method == "parquet" and not self.output_path.exists():
@@ -89,8 +87,8 @@ class DataFrameWriter:
     # -------------------------------
     def write(self):
         """Validate (optional) and write the dataframe using the chosen backend."""
-        if self.validate and self.schema is not None:
-            self._validate_with_pandera()
+        # if self.validate and self.schema is not None:
+        #     self._validate_with_pandera()
 
         writer_func = DataFrameWriterRegistry.get_writer(self.write_method)
         writer_func(self)  # Pass the instance to the writer function
@@ -98,17 +96,17 @@ class DataFrameWriter:
     # -------------------------------
     # Schema validation
     # -------------------------------
-    def _validate_with_pandera(self):
-        # """Validate the dataframe using a Pandera schema, if available."""
-        # if pa is None:
-        #     raise ImportError("Pandera is not installed. Install it with `pip install pandera`.")
+    # def _validate_with_pandera(self):
+    #     # """Validate the dataframe using a Pandera schema, if available."""
+    #     # if pa is None:
+    #     #     raise ImportError("Pandera is not installed. Install it with `pip install pandera`.")
 
-        if isinstance(self.schema, DataFrameSchema):
-            self.df = self.schema.validate(self.df)
-        else:
-            raise TypeError("Schema must be a pandera DataFrameSchema")
+    #     if isinstance(self.schema, DataFrameSchema):
+    #         self.df = self.schema.validate(self.df)
+    #     else:
+    #         raise TypeError("Schema must be a pandera DataFrameSchema")
 
-        print("DataFrame validated successfully with Pandera schema.")
+    #     print("DataFrame validated successfully with Pandera schema.")
 
 
 # ======================================================
@@ -119,22 +117,13 @@ class DataFrameWriter:
 @DataFrameWriterRegistry.register("parquet")
 def write_parquet(writer: DataFrameWriter):
     """Write to partitioned or flat Parquet files."""
-    df = writer.df
-    output_path = writer.output_path
-    table_name = writer.table_name
+    df: DataFrame = writer.df
+    partition_cols: list[str] = writer.partition_cols
+    db: str = writer.db
+    table_name: str = writer.table_name if partition_cols else writer.table_name + ".parquet"
 
-    partition_cols = writer.partition_cols
-    db = writer.db
-
-    # output_path = Path(output_path) / db / (table_name + ".parquet")
-
-    if partition_cols:
-        output_path = Path(output_path) / db / (table_name)
-        df.to_parquet(output_path, partition_cols=partition_cols, index=False)
-    else:
-        output_path = Path(output_path) / db / (table_name + ".parquet")
-        # file_path = output_path / "table_name.parquet" if output_path.is_dir() else output_path
-        df.to_parquet(output_path, index=False)
+    output_path: Path = writer.output_path / db / table_name
+    df.to_parquet(output_path, partition_cols=partition_cols, index=False)
 
     print(f"Wrote Parquet data to: {output_path}")
 
@@ -143,7 +132,7 @@ def write_parquet(writer: DataFrameWriter):
 def write_duckdb(writer: DataFrameWriter):
     """Write to a DuckDB database."""
 
-    df = writer.df
+    df: DataFrame = writer.df
     output_path = writer.output_path
     table_name = writer.table_name
     mode = writer.mode
@@ -170,7 +159,7 @@ def write_duckdb(writer: DataFrameWriter):
 @DataFrameWriterRegistry.register("sqlite")
 def write_sqlite(writer: DataFrameWriter):
     """Write to a SQLite database."""
-    df = writer.df
+    df: DataFrame = writer.df
     output_path = writer.output_path
     table_name = writer.table_name
     mode = writer.mode

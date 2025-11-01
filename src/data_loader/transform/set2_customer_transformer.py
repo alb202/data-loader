@@ -9,8 +9,8 @@ from src.data_loader.transform.transform_base import Transform
 class Transformer(Transform):
     """Implementation of transformer class"""
 
-    @classmethod
-    def transform(cls, *dfs: DataFrame, schema: DataFrameSchema) -> DataFrame:
+    @staticmethod
+    def transform(*dfs: DataFrame, output_schema: DataFrameSchema) -> DataFrame:
         # Make a copy of the dataframe
         df_final = dfs[0].copy(deep=True)
 
@@ -42,7 +42,7 @@ class Transformer(Transform):
         df_final["sex"] = df_final["sex"].map({"Male": "M", "Female": "F"})
 
         # Get the columns and sort
-        df_final = df_final.loc[:, schema.columns.keys()]
+        df_final = df_final.loc[:, list(output_schema.columns.keys())]
 
         # Return dataframe
         return df_final

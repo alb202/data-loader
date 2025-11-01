@@ -1,0 +1,22 @@
+[[extract_files]]
+folder = "/Users/ab/Projects/data-loader/samples/dataset1/"
+file_name = "customer_address_set1.csv"
+schema_name = "set1_customer_address_input"
+label = "Customer address file"
+
+[[extract_files]]
+folder = "/Users/ab/Projects/data-loader/samples/dataset1/"
+file_name = "customer_details_set1.csv"
+schema_name = "set1_customer_details_input"
+label = "Customer details file"
+
+[details]
+name = "set1_customer_pipeline"
+description = "Transform customer data from sample set 1 for customers table"
+transformer_pipeline = "set1_customer_transformer"
+
+[output_table]
+table_name = "customers"
+schema_name = "customer_model"
+db = "Purchases"
+data_label = "Set1"

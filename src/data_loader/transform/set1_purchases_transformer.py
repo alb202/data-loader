@@ -13,25 +13,28 @@ class Transformer(Transform):
 
         # Rename these columns
         rename_map = {
-            "cust_id": "customer_id",
-            "item_name": "item_description",
-            "cost": "price_paid",
-            "sku": "item_code",
-            "purchase_channel": "purchase_location",
+            "person_id": "customer_id",
+            "purchase_date": "date",
+            "item_desc": "item_description",
+            "item_no": "item_code",
+            "price_usd": "price_paid",
         }
         df_final = df_final.rename(columns=rename_map)
 
         # Create a date column from separate values
-        df_final["date"] = to_datetime(dict(year=df_final["year"], month=df_final["month"], day=df_final["day"]))
+        df_final["date"] = to_datetime(df_final["date"], format="%Y-%M-%d").dt.date
 
         # Remove prefix from customer ID
-        df_final["customer_id"] = df_final["customer_id"].apply(lambda customer_id: customer_id.replace("P-", ""))
+        df_final["customer_id"] = df_final["customer_id"].apply(lambda customer_id: customer_id.replace("C", ""))
 
         # Make purchase location lowercase
-        df_final["purchase_location"] = df_final["purchase_location"].apply(lambda purchase_location: purchase_location.lower())
+        df_final["purchase_location"] = "online"
 
         # Fill column with null values
         df_final["item_name"] = None
+
+        # Fill in the currency value. Assume USD
+        df_final["currency"] = "USD"
 
         # Get the columns and sort
         df_final = df_final.loc[:, list(output_schema.columns.keys())]

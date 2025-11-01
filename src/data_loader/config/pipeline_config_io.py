@@ -1,8 +1,8 @@
 from models.pipeline_config_model import PipelineConfig, PipelineDetails, OutputTable, InputFile
 
-import toml
 from pathlib import Path
 from dataclasses import asdict
+import toml
 
 
 def save_pipeline_config(config: PipelineConfig, file_name: str, config_folder: Path) -> None:
@@ -10,14 +10,15 @@ def save_pipeline_config(config: PipelineConfig, file_name: str, config_folder: 
         toml.dump(asdict(config), f)
 
 
-def load_pipeline_config(path: str) -> PipelineConfig:
-    path = Path(path)
+def load_pipeline_config(path: Path) -> PipelineConfig:
+    # if not isinstance(path, Path):
+    #     path: Path = Path(path)
 
     if not path.exists():
         raise FileNotFoundError(f"Configuration file not found: {path}")
 
     with open(path, "r") as f:
-        config_dict = toml.load(f)
+        config_dict: dict = toml.load(f)
 
     try:
         details = PipelineDetails(**config_dict["details"])
