@@ -7,27 +7,37 @@ from pathlib import Path
 
 def load_object_from_file(folder_name: Path, file_name: str, object_name: str) -> Any:
     """
-    Dynamically loads an object (e.g., schema or class) from a Python file at runtime.
-
+    Load and return an attribute (e.g., class, function, variable) from a Python source file.
     Parameters
     ----------
-    file_path : str
-        The path to the Python file containing the object.
-    object_name : str, optional
-        The name of the object to load (default is 'schema').
-
+    folder_name : Path
+        Directory containing the target Python file.
+    file_name : str
+        File name of the Python module. The file name may include or omit the ".py" extension;
+        the base name (extension removed) is used to derive an internal module name.
+    object_name : str
+        Name of the attribute to retrieve from the loaded module.
     Returns
     -------
     Any
-        The requested object from the module.
-
+        The attribute named by `object_name` from the dynamically loaded module.
     Raises
     ------
     FileNotFoundError
-        If the file does not exist.
+        If the constructed file path (folder_name / file_name) does not exist.
+    ImportError
+        If a module spec cannot be created or the loader is not available for the specified file.
     AttributeError
-        If the specified object is not found in the module.
+        If the loaded module does not define an attribute with the given `object_name`.
+    Notes
+    -----
+    - The function loads and executes the module's top-level code using importlib.util.spec_from_file_location
+      and the spec's loader; executing the module will run any module-level side effects.
+    - A new module object is created and executed; it is not guaranteed to be automatically inserted into sys.modules
+      under the derived module name.
+    - Use caution when loading and executing untrusted code, as this may introduce security risks.
     """
+
     file_path: Path = folder_name / file_name
 
     if not os.path.exists(file_path):

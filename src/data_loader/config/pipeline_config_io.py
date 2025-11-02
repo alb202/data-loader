@@ -6,13 +6,29 @@ import toml
 
 
 def save_pipeline_config(config: PipelineConfig, file_name: str, config_folder: Path) -> None:
+    """
+    Save a pipeline configuration object to a TOML file in the specified folder
+
+    :param config: Pipeline configuration object to save
+    :type config: PipelineConfig
+    :param file_name: Name of the TOML file (without extension)
+    :type file_name: str
+    :param config_folder: Directory where the configuration file will be saved
+    :type config_folder: Path
+    """
     with open(config_folder / f"{file_name}.toml", "w") as f:
         toml.dump(asdict(config), f)
 
 
 def load_pipeline_config(path: Path) -> PipelineConfig:
-    # if not isinstance(path, Path):
-    #     path: Path = Path(path)
+    """
+    Load a pipeline configuration from a TOML file and return a PipelineConfig object
+
+    :param path: Path to the TOML configuration file to load
+    :type path: Path
+    :return: Loaded PipelineConfig object containing pipeline details, output table, and extract files
+    :rtype: PipelineConfig
+    """
 
     if not path.exists():
         raise FileNotFoundError(f"Configuration file not found: {path}")

@@ -23,13 +23,14 @@ import argparse
 # import pandas as pd
 
 
-SAVE_METHODS = ["parquet", "duckdb", "sqlite"]
-
+SAVE_METHODS = ["parquet", "duckdb", "sqlite", "tsv", "csv"]
+MODES = ["append", "overwrite"]
 DEFAULT_PATHS = {
     "logs": "../../logs/",
-    "models": "sample_models/",
-    "transformers": "src/data_loader/transform/implementations/",
-    "output": "sample_output/",
+    "models": "../../sample_models/",
+    "transformers": "transform/implementations/",
+    "output": "../../sample_output/",
+    "configs": "../../sample_configs/",
 }
 
 
@@ -40,10 +41,10 @@ def run_pipeline(
     # extractor_cls,
     # transformer_cls,
     # loader_cls,
-    # logger,
+    mode: str = "append",
     # input_schema=None,
     # output_schema=None,
-    dry_run=False,
+    dry_run: bool = False,
     save_method: str = "parquet",
 ) -> None:
     # Handle single or multiple input files
@@ -153,7 +154,7 @@ def run_pipeline(
             write_method=save_method,
             table_name=config_dict.output_table.table_name,
             db=config_dict.output_table.db,
-            mode="overwrite",
+            mode="append",
             # validate=False,
             partition_cols=["data_label"],
             # schema=None,
@@ -212,6 +213,7 @@ def cli():
     run_parser = subparsers.add_parser("run", help="Run a pipeline")
     run_parser.add_argument("--config", required=True, help="Path to the TOML config")
     run_parser.add_argument("--save_method", required=False, default="parquet", choices=SAVE_METHODS, help="Method for saving data")
+    run_parser.add_argument("--mode", required=False, default="append", choices=MODES, help="Method for saving data")
     run_parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -224,7 +226,7 @@ def cli():
 
     # list command
     list_parser = subparsers.add_parser("list", help="List available TOML configs")
-    list_parser.add_argument("--dir", required=False, default="sample_configs/", help="Directory to search for .toml files")
+    list_parser.add_argument("--dir", required=False, default=DEFAULT_PATHS.get("configs"), help="Directory to search for .toml files")
 
     args = parser.parse_args()
 
@@ -254,13 +256,7 @@ def cli():
         run_pipeline(
             config=args.config,
             save_method=args.save_method,
-            # output_dest=config["output_dest"],
-            # extractor_cls=config["extractor_cls"],
-            # transformer_cls=config["transformer_cls"],
-            # loader_cls=config["loader_cls"],
-            # logger=logger,
-            # input_schema=config["input_schema"],
-            # output_schema=config["output_schema"],
+            mode=args.mode,
             dry_run=args.dry_run,
         )
 

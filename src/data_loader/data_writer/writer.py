@@ -13,10 +13,14 @@ from typing import Optional, Union, Literal, Callable, Dict
 #     pa = None
 
 
+def create_directory(path: Path) -> None:
+    print(path)
+    path.mkdir(exist_ok=True, parents=True)
+
+
 class DataFrameWriterRegistry:
     """
-    Registry for writer backends.
-    Allows new writer types to be registered dynamically.
+    Registry for managing and retrieving DataFrame writer backends
     """
 
     _writers: Dict[str, Callable] = {}
@@ -33,6 +37,15 @@ class DataFrameWriterRegistry:
 
     @classmethod
     def get_writer(cls, name: str):
+        """
+        Retrieve a registered DataFrame writer backend by name
+
+        :param cls: The registry class containing writer backends
+        :param name: Name of the writer backend to retrieve
+        :type name: str
+        :return: The writer backend callable associated with the given name
+        :rtype: Callable[..., Any]
+        """
         if name.lower() not in cls._writers:
             raise ValueError(f"No writer registered for '{name}'.")
         return cls._writers[name.lower()]
@@ -133,10 +146,10 @@ def write_duckdb(writer: DataFrameWriter):
     """Write to a DuckDB database."""
 
     df: DataFrame = writer.df
-    output_path = writer.output_path
-    table_name = writer.table_name
-    mode = writer.mode
-    db = writer.db
+    output_path: Path = writer.output_path
+    table_name: str = writer.table_name
+    mode: str = writer.mode
+    db: str = writer.db
 
     if not table_name:
         raise ValueError("A table_name is required for DuckDB writes.")
@@ -160,20 +173,20 @@ def write_duckdb(writer: DataFrameWriter):
 def write_sqlite(writer: DataFrameWriter):
     """Write to a SQLite database."""
     df: DataFrame = writer.df
-    output_path = writer.output_path
-    table_name = writer.table_name
-    mode = writer.mode
-    db = writer.db
+    output_path: Path = writer.output_path
+    table_name: str = writer.table_name
+    mode: str = writer.mode
+    db: str = writer.db
 
     if not table_name:
         raise ValueError("A table_name is required for SQLite writes.")
 
-    output_path = Path(output_path) / (db + ".sqlite")
+    output_path: Path = Path(output_path) / (db + ".sqlite")
 
-    conn = sqlite3.connect(output_path)
+    conn: sqlite3.Connection = sqlite3.connect(output_path)
     df.to_sql(
-        table_name,
-        conn,
+        name=table_name,
+        con=conn,
         if_exists="replace" if mode == "overwrite" else "append",
         index=False,
     )
@@ -184,10 +197,37 @@ def write_sqlite(writer: DataFrameWriter):
 @DataFrameWriterRegistry.register("tsv")
 def write_tsv(writer: DataFrameWriter):
     """Write to tab-delimited text file."""
-    df, output_path = writer.df, writer.output_path
-    file_path = output_path / "data.tsv" if output_path.is_dir() else output_path
-    df.to_csv(file_path, sep="\t", index=False)
+    df: DataFrame = writer.df
+    output_path: Path = writer.output_path
+    table_name: str = writer.table_name
+    db: str = writer.db
+
+    create_directory(path=(output_path / db))
+
+    file_path: Path = output_path / db / f"{table_name}.tsv"
+    mode: str = "a" if writer.mode == "append" and file_path.exists() else "w"
+    header: bool = True if mode == "w" else False
+
+    df.to_csv(file_path, sep="\t", mode=mode, index=False, header=header)
     print(f"Wrote TSV file: {file_path}")
+
+
+@DataFrameWriterRegistry.register("csv")
+def write_tsv(writer: DataFrameWriter):
+    """Write to comma-delimited text file."""
+    df: DataFrame = writer.df
+    output_path: Path = writer.output_path
+    table_name: str = writer.table_name
+    db: str = writer.db
+
+    create_directory(path=(output_path / db))
+
+    file_path: Path = output_path / db / f"{table_name}.csv"
+    mode: str = "a" if writer.mode == "append" and file_path.exists() else "w"
+    header: bool = True if mode == "w" else False
+
+    df.to_csv(file_path, sep=",", mode=mode, index=False, header=header)
+    print(f"Wrote CSV file: {file_path}")
 
 
 # import pandas as pd
