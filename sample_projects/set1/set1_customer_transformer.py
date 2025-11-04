@@ -31,15 +31,17 @@ class Transformer(Transform):
         address_parts = df_final["address_full"].str.extract(r"(?P<address_street_number>\d+)\s+(?P<address_street_name>[^,]+)")
 
         # Split the address_line into components
-        name_parts = df_final["full_name"].str.extract(r"(?P<first_name>\d+)\s+(?P<last_name>[^,]+)")
+        # name_parts = df_final["full_name"].str.extract(r"(?P<first_name>\d+)\s+(?P<last_name>[^,]+)")
+        # name_parts = df_final["full_name"].str.extract(r"(?P<first_name>)\s+(?P<last_name>)")
+        df_final[["first_name", "last_name"]] = df_final["full_name"].str.extract(r"^\s*([A-Za-z-]+)\s+(.+)$")
 
         # Get the address components
         df_final["address_street_number"] = address_parts["address_street_number"]
         df_final["address_street_name"] = address_parts["address_street_name"]
 
-        # Get the address components
-        df_final["first_name"] = name_parts["first_name"]
-        df_final["last_name"] = name_parts["last_name"]
+        # # Get the address components
+        # df_final["first_name"] = name_parts["first_name"]
+        # df_final["last_name"] = name_parts["last_name"]
 
         # Validate the postal code length
         df_final["address_postal_code"] = df_final["address_postal_code"].apply(lambda apc: str(str(apc)[:5])).astype(str)

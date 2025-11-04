@@ -1,4 +1,4 @@
-from src.data_loader.utilities.read_utilities import validate_file, validate_path
+from src.utilities.read_utilities import validate_file, validate_path
 import pytest
 
 

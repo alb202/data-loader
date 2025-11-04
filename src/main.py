@@ -1,61 +1,32 @@
 from pathlib import Path
-# import pandera as pa
 
-# from extract.csv_extractor import CSVExtractor
-# from transform.example_transform import ExampleTransform
-# from load.parquet_loader import ParquetLoader
-# from data_loader.extract.extract_base import Extract
-# from data_loader.transform.example_transform import Extract
-# from data_loader.load.load_parquet import ParquetLoader
 from logger.logging_utilties import setup_logger, get_timestamp
 from config.pipeline_config_io import load_pipeline_config  # , #load_config
 from extract.read_data import read_input_data
 from utilities.object_loader import load_object_from_file
 from models.extract_pipeline_data_model import ExtractPipelineData
 
-# from utilities.class_loader import load_class_from_file  # DynamicClassLoader, load_class,
-from data_writer.writer import DataFrameWriter  # , DataFrameWriterRegistry
-
-# from src.data_loader.
+from data_writer.writer import DataFrameWriter
 import argparse
-# from pathlib import Path
-# import glob
-# import pandas as pd
 
 
 SAVE_METHODS = ["parquet", "duckdb", "sqlite", "tsv", "csv"]
 MODES = ["append", "overwrite"]
 DEFAULT_PATHS = {
     "logs": "../logs/",
-    "models": "sample_models/",
-    "transformers": "sample_transformers/",
-    "output": "../sample_output/",
+    "models": "models/",
+    # "transformers": "sample_transformers/",
+    # "output": "../sample_output/",
     "configs": "../sample_configs/",
 }
 
 
 def run_pipeline(
     config: str,
-    # input_paths,
-    # output_dest: str,
-    # extractor_cls,
-    # transformer_cls,
-    # loader_cls,
     mode: str = "append",
-    # input_schema=None,
-    # output_schema=None,
     dry_run: bool = False,
     save_method: str = "parquet",
 ) -> None:
-    # Handle single or multiple input files
-    # input_pattern = config["input_path"]
-    # input_paths = sorted(glob.glob(input_pattern))
-    # if not input_paths:
-    #     logger.error(f"No input files found for pattern: {input_pattern}")
-    #     return
-
-    # log_file = config["name"] + ".log"
-
     logger = setup_logger(log_file=Path(DEFAULT_PATHS.get("logs")).resolve() / f"log_file__{get_timestamp()}", name="Logger")
 
     logger.info("Logging started")
@@ -75,132 +46,55 @@ def run_pipeline(
     logger.info(f"Dry-run mode: {dry_run}")
 
     # Extract
-
     extract_files: list = []
     for file_number, extract_file in enumerate(config_dict.extract_files):
-        data = read_input_data(folder=extract_file.folder, file_name=extract_file.file_name)
-        logger.info(f"File {file_number}: {extract_file.file_name} has been loaded")
+        data = read_input_data(path=extract_file.data_file)
+        logger.info(f"File {file_number}: {extract_file.data_file} has been loaded")
 
         schema = load_object_from_file(
-            folder_name=Path(DEFAULT_PATHS.get("models")).resolve(), file_name=extract_file.schema_name + ".py", object_name="schema"
+            folder_name=Path(config_dict.details.project_path).resolve(), file_name=extract_file.schema_file + ".py", object_name="schema"
         )
-        logger.info(f"Schema {file_number}: {extract_file.schema_name} has been loaded")
+        logger.info(f"Schema {file_number}: {extract_file.schema_file} has been loaded")
 
         validated_data = schema.validate(data)
         logger.info(f"Data '{extract_file.label}' has been validated")
 
         extract_files.append(ExtractPipelineData(label=extract_file.label, schema=schema, data=validated_data))
 
-    # print(extract_files)
-
     # Transform
-
-    # print("transformer_pipeline", "src/data_loader/transform/" + config_dict.details.transformer_pipeline + ".py")
-
-    # print("package root", Path("./").resolve())
-
-    # load_schema_from_file: dict = dict(
-    #     filepath="sample_models/" + config_dict.output_table.schema_name + ".py",
-    #     class_name="schema",
-    #     package_root=Path(".").resolve(),  # .as_posix(),  # "/Users/ab/Projects/data-loader/",
-    #     # package_root="/Users/ab/Projects/data-loader/",
-    # )
-    # load_transformer_from_file: dict = dict(
-    #     filepath="src/data_loader/transform/" + config_dict.details.transformer_pipeline + ".py",
-    #     class_name="Transformer",
-    #     package_root=Path(".").resolve(),  # .as_posix(),  # "/Users/ab/Projects/data-loader/",
-    #     # package_root="/Users/ab/Projects/data-loader/",
-    # )
-
-    # print("load_schema_from_file", load_schema_from_file)
-    # print("load_transformer_from_file", load_transformer_from_file)
-
-    # output_schema = load_class_from_file(**load_schema_from_file)
-    # transformer_class = load_class_from_file(**load_transformer_from_file)
-
     output_schema = load_object_from_file(
         folder_name=Path(DEFAULT_PATHS.get("models")).resolve(),
-        file_name=config_dict.output_table.schema_name + ".py",
+        file_name=config_dict.output_table.schema_file + ".py",
         object_name="schema",
     )
     transformer_class = load_object_from_file(
-        folder_name=Path(DEFAULT_PATHS.get("transformers")).resolve(),
+        folder_name=Path(config_dict.details.project_path).resolve(),
         file_name=config_dict.details.transformer_pipeline + ".py",
         object_name="Transformer",
     )
 
-    #     folder_path="src/data_loader/transform/", file_name=config_dict.details.transformer_pipeline, class_name="transform"
-    # )
-    # transformer_class.transform()
-
-    # transformer_class = DynamicClassLoader(
-    #     folder_path="src/data_loader/transform/", file_name=config_dict.details.transformer_pipeline, class_name="transform"
-    # )
     transformed_df = transformer_class.transform(*[extract_file.data for extract_file in extract_files], output_schema=output_schema)
     transformer_class.validate_output(df=transformed_df, output_schema=output_schema)
-    # print(transformed_df)
 
     # Load
-
     logger.info(f"Saving data to disk with method: {save_method}")
-    logger.info(f"Output location: {DEFAULT_PATHS.get('output')}")
+    logger.info(f"Output location: {config_dict.output_table.output_path}")
     logger.info(f"Database: {config_dict.output_table.db}")
     logger.info(f"Table name: {config_dict.output_table.table_name}")
 
     if not dry_run:
         DataFrameWriter(
             df=transformed_df.assign(data_label=config_dict.output_table.data_label),
-            output_path=Path(DEFAULT_PATHS.get("output")).resolve(),
+            output_path=Path(config_dict.output_table.output_path).resolve(),
             write_method=save_method,
             table_name=config_dict.output_table.table_name,
             db=config_dict.output_table.db,
             mode=mode,
-            # validate=False,
             partition_cols=["data_label"],
-            # schema=None,
         ).write()
     else:
         logger.info("Dry-run selected. No data written.")
     logger.info("Pipeline execution complete!")
-
-    # """Core ETL pipeline execution logic."""
-    # transformer = transformer_cls()
-    # loader = loader_cls()
-    # all_results = []
-
-    # for input_path in input_paths:
-    #     extractor = extractor_cls()
-    #     logger.info(f"Extracting data from: {input_path}")
-    #     df = extractor.read(Path(input_path))
-    #     logger.info(f"→ Loaded {len(df)} rows from {Path(input_path).name}")
-
-    #     # Validate input
-    #     if input_schema:
-    #         logger.info("Validating input schema...")
-    #         df = transformer.validate_input(df, input_schema)
-    #         logger.info("Input validation passed")
-
-    #     # Transform
-    #     df = transformer.transform(df)
-    #     logger.info("Transformation complete")
-
-    #     # Validate output
-    #     if output_schema:
-    #         logger.info("Validating output schema...")
-    #         df = transformer.validate_output(df, output_schema)
-    #         logger.info("Output validation passed")
-
-    #     if dry_run:
-    #         logger.info("Dry-run enabled: skipping data output.")
-    #     else:
-    #         loader.write(df, output_dest)
-    #         logger.info(f"Data written to {output_dest}")
-
-    #     all_results.append(df)
-
-    # combined = pd.concat(all_results, ignore_index=True)
-    # logger.info(f"Combined total rows processed: {len(combined)}")
-    # return combined
 
 
 def cli():
@@ -219,10 +113,6 @@ def cli():
         action="store_true",
         help="Run validation and transformation only, skip loading",
     )
-    # run_parser.add_argument(
-    #     "--override-log",
-    #     help="Optional log file path override",
-    # )
 
     # list command
     list_parser = subparsers.add_parser("list", help="List available TOML configs")
@@ -231,36 +121,12 @@ def cli():
     args = parser.parse_args()
 
     if args.command == "run":
-        # config_path = Path(args.config)
-        # if not config_path.exists():
-        #     print(f"Config file not found: {config_path}")
-        #     return
-
-        # config = load_config(config_path)
-        # log_file = args.override_log or config["pipeline_name"] + ".log"
-
-        # logger = setup_logger(
-        #     log_file=config.get("log_file", log_file),
-        # )
-
-        # logger.info(f"Starting pipeline: {config['pipeline_name']}")
-        # logger.info(f"Dry-run mode: {args.dry_run}")
-
-        # # Handle single or multiple input files
-        # input_pattern = config["input_path"]
-        # input_paths = sorted(glob.glob(input_pattern))
-        # if not input_paths:
-        #     logger.error(f"No input files found for pattern: {input_pattern}")
-        #     return
-
         run_pipeline(
             config=args.config,
             save_method=args.save_method,
             mode=args.mode,
             dry_run=args.dry_run,
         )
-
-        # logger.info("Pipeline execution complete!")
 
     elif args.command == "list":
         config_dir = Path(args.dir).resolve()

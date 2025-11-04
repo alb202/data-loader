@@ -1,9 +1,9 @@
-# from pydantic.dataclasses import dataclass
-from dataclasses import dataclass  # , asdict
+from dataclasses import dataclass
 
 
 @dataclass
 class PipelineDetails:
+    project_path: str
     name: str
     description: str
     transformer_pipeline: str
@@ -11,16 +11,16 @@ class PipelineDetails:
 
 @dataclass
 class InputFile:
-    folder: str
-    file_name: str
-    schema_name: str
+    data_file: str
+    schema_file: str
     label: str
 
 
 @dataclass
 class OutputTable:
+    schema_file: str
+    output_path: str
     table_name: str
-    schema_name: str
     db: str
     data_label: str
 

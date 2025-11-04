@@ -41,6 +41,10 @@ class Transformer(Transform):
         # Reformat the sex string
         df_final["sex"] = df_final["sex"].map({"Male": "M", "Female": "F"})
 
+        # Add the name columns
+        # df_final["first_name"] = df_final["first_name"]
+        # df_final["last_name"] = df_final["last_name"]
+
         # Get the columns and sort
         df_final = df_final.loc[:, list(output_schema.columns.keys())]
 
