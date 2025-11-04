@@ -213,7 +213,7 @@ def write_tsv(writer: DataFrameWriter):
 
 
 @DataFrameWriterRegistry.register("csv")
-def write_tsv(writer: DataFrameWriter):
+def write_csv(writer: DataFrameWriter):
     """Write to comma-delimited text file."""
     df: DataFrame = writer.df
     output_path: Path = writer.output_path

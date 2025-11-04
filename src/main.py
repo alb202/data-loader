@@ -26,11 +26,11 @@ import argparse
 SAVE_METHODS = ["parquet", "duckdb", "sqlite", "tsv", "csv"]
 MODES = ["append", "overwrite"]
 DEFAULT_PATHS = {
-    "logs": "../../logs/",
-    "models": "../../sample_models/",
-    "transformers": "transform/implementations/",
-    "output": "../../sample_output/",
-    "configs": "../../sample_configs/",
+    "logs": "../logs/",
+    "models": "sample_models/",
+    "transformers": "sample_transformers/",
+    "output": "../sample_output/",
+    "configs": "../sample_configs/",
 }
 
 
@@ -154,7 +154,7 @@ def run_pipeline(
             write_method=save_method,
             table_name=config_dict.output_table.table_name,
             db=config_dict.output_table.db,
-            mode="append",
+            mode=mode,
             # validate=False,
             partition_cols=["data_label"],
             # schema=None,
