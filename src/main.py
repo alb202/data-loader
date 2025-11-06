@@ -5,7 +5,7 @@ from config.pipeline_config_io import load_pipeline_config  # , #load_config
 from extract.read_data import read_input_data
 from utilities.object_loader import load_object_from_file
 from models.extract_pipeline_data_model import ExtractPipelineData
-
+from utilities.transformer_loader import load_transformer_function
 from data_writer.writer import DataFrameWriter
 import argparse
 
@@ -14,10 +14,7 @@ SAVE_METHODS = ["parquet", "duckdb", "sqlite", "tsv", "csv"]
 MODES = ["append", "overwrite"]
 DEFAULT_PATHS = {
     "logs": "../logs/",
-    "models": "models/",
-    # "transformers": "sample_transformers/",
-    # "output": "../sample_output/",
-    "configs": "../sample_configs/",
+    "signature_model": "src/models/default_signature_model.py",
 }
 
 
@@ -63,18 +60,27 @@ def run_pipeline(
 
     # Transform
     output_schema = load_object_from_file(
-        folder_name=Path(DEFAULT_PATHS.get("models")).resolve(),
+        folder_name=Path(config_dict.output_table.schema_file).parent.resolve(),
         file_name=config_dict.output_table.schema_file + ".py",
         object_name="schema",
     )
-    transformer_class = load_object_from_file(
-        folder_name=Path(config_dict.details.project_path).resolve(),
-        file_name=config_dict.details.transformer_pipeline + ".py",
-        object_name="Transformer",
+
+    func = load_transformer_function(
+        transformer_file=Path(config_dict.details.project_path) / (config_dict.details.transformer_pipeline + ".py"),
+        template_file=Path(DEFAULT_PATHS.get("signature_model")).resolve(),
     )
 
-    transformed_df = transformer_class.transform(*[extract_file.data for extract_file in extract_files], output_schema=output_schema)
-    transformer_class.validate_output(df=transformed_df, output_schema=output_schema)
+    transformed_df = func(*[extract_file.data for extract_file in extract_files], output_schema=output_schema)
+    transformed_df = output_schema.validate(transformed_df)
+
+    # transformer_class = load_object_from_file(
+    #     folder_name=Path(config_dict.details.project_path).resolve(),
+    #     file_name=config_dict.details.transformer_pipeline + ".py",
+    #     object_name="Transformer",
+    # )
+
+    # transformed_df = transformer_class.transform(*[extract_file.data for extract_file in extract_files], output_schema=output_schema)
+    # transformer_class.validate_output(df=transformed_df, output_schema=output_schema)
 
     # Load
     logger.info(f"Saving data to disk with method: {save_method}")

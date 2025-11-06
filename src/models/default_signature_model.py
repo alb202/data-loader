@@ -1,0 +1,3 @@
+from pandas import DataFrame
+
+def transform(*dfs: DataFrame, **kwargs) -> DataFrame: ...
