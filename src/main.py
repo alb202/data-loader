@@ -13,7 +13,6 @@ import argparse
 SAVE_METHODS = ["parquet", "duckdb", "sqlite", "tsv", "csv"]
 MODES = ["append", "overwrite"]
 DEFAULT_PATHS = {
-    "logs": "../logs/",
     "signature_model": "src/models/default_signature_model.py",
 }
 
@@ -24,19 +23,19 @@ def run_pipeline(
     dry_run: bool = False,
     save_method: str = "parquet",
 ) -> None:
-    logger = setup_logger(log_file=Path(DEFAULT_PATHS.get("logs")).resolve() / f"log_file__{get_timestamp()}", name="Logger")
-
-    logger.info("Logging started")
-
     try:
         config_dict = load_pipeline_config(path=Path(config))
-        logger.info("Configuration file successfully loaded.")
-        logger.info(config_dict)
+        # logger.info("Configuration file successfully loaded.")
+        # logger.info(config_dict)
     except Exception as e:
         print(e)
-        msg = "Error trying to import configuration. Check format and try again."
-        logger.exception(msg)
-        raise ValueError(msg)
+        # logger.exception(msg)
+        raise ValueError("Error trying to import configuration. Check format and try again.")
+
+    logger = setup_logger(
+        log_file=Path(config_dict.details.project_path).resolve() / "logs" / f"log_file__{get_timestamp()}", name="Logger"
+    )
+    logger.info("Logging started")
 
     logger.info(f"Pipeline name: {config_dict.details.name}")
     logger.info(f"Pipeline description: {config_dict.details.description}")
