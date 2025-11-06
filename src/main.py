@@ -123,6 +123,9 @@ def cli():
     list_parser = subparsers.add_parser("list", help="List available TOML configs")
     list_parser.add_argument("--dir", required=False, default=DEFAULT_PATHS.get("configs"), help="Directory to search for .toml files")
 
+    list_parser = subparsers.add_parser("validate", help="List available TOML configs")
+    list_parser.add_argument("--config", required=False, default=None, help="Configuration file to validate")
+
     args = parser.parse_args()
 
     if args.command == "run":
@@ -143,6 +146,9 @@ def cli():
             for f in toml_files:
                 print(f"  - {f.resolve()}")
 
+    elif args.command == "validate":
+        load_pipeline_config(path=Path(args.config))
+        print(f"Successfully validated config file: {args.config}")
     else:
         parser.print_help()
 
