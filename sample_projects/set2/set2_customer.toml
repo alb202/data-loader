@@ -2,15 +2,15 @@
 project_path = "/Users/ab/Projects/data-loader/sample_projects/set2"
 name = "set2_customer_pipeline"
 description = "Transform customer data from sample set 2 for customers table"
-transformer_pipeline = "/Users/ab/Projects/data-loader/sample_projects/set2/transformers/set2_customer_transformer"
+transformer_pipeline = "/Users/ab/Projects/data-loader/sample_projects/set2/transformers/set2_customer_transformer.py"
 
 [[extract_files]]
 data_file = "/Users/ab/Projects/data-loader/sample_projects/set2/data/customers_set2.csv"
-schema_file = "/Users/ab/Projects/data-loader/sample_projects/set2/models/set2_customer_input_model"
+schema_file = "/Users/ab/Projects/data-loader/sample_projects/set2/models/set2_customer_input_model.py"
 label = "Customer address file"
 
 [output]
-schema_file = "/Users/ab/Projects/data-loader/sample_projects/models/customer_model"
+schema_file = "/Users/ab/Projects/data-loader/sample_projects/models/customer_model.py"
 output_path = "/Users/ab/Projects/data-loader/sample_output/"
 table_name = "customers"
 db = "PurchasesDB"

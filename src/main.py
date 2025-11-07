@@ -48,7 +48,7 @@ def run_pipeline(
         logger.info(f"File {file_number}: {extract_file.data_file} has been loaded")
 
         schema = load_object_from_file(
-            folder_name=Path(config_dict.details.project_path).resolve(), file_name=extract_file.schema_file + ".py", object_name="schema"
+            folder_name=Path(config_dict.details.project_path).resolve(), file_name=extract_file.schema_file, object_name="schema"
         )
         logger.info(f"Schema {file_number}: {extract_file.schema_file} has been loaded")
 
@@ -60,12 +60,12 @@ def run_pipeline(
     # Transform
     output_schema = load_object_from_file(
         folder_name=Path(config_dict.output_table.schema_file).parent.resolve(),
-        file_name=config_dict.output_table.schema_file + ".py",
+        file_name=config_dict.output_table.schema_file,
         object_name="schema",
     )
 
     func = load_transformer_function(
-        transformer_file=Path(config_dict.details.project_path) / (config_dict.details.transformer_pipeline + ".py"),
+        transformer_file=Path(config_dict.details.project_path) / (config_dict.details.transformer_pipeline),
         template_file=Path(DEFAULT_PATHS.get("signature_model")).resolve(),
     )
 
