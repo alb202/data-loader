@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from logger.logging_utilties import setup_logger, get_timestamp
 from config.pipeline_config_io import load_pipeline_config  # , #load_config
 from extract.read_data import read_input_data
@@ -7,7 +5,9 @@ from utilities.object_loader import load_object_from_file
 from models.extract_pipeline_data_model import ExtractPipelineData
 from utilities.transformer_loader import load_transformer_function
 from data_writer.writer import DataFrameWriter
+
 import argparse
+from pathlib import Path
 
 
 SAVE_METHODS = ["parquet", "duckdb", "sqlite", "tsv", "csv"]
@@ -123,8 +123,11 @@ def cli():
     list_parser = subparsers.add_parser("list", help="List available TOML configs")
     list_parser.add_argument("--dir", required=False, default=DEFAULT_PATHS.get("configs"), help="Directory to search for .toml files")
 
-    list_parser = subparsers.add_parser("validate", help="List available TOML configs")
-    list_parser.add_argument("--config", required=False, default=None, help="Configuration file to validate")
+    list_parser = subparsers.add_parser("validate", help="Validate the structure of a config file")
+    list_parser.add_argument("--config", required=False, default="", help="Configuration file to validate")
+
+    list_parser = subparsers.add_parser("read", help="Test the reading of a data file")
+    list_parser.add_argument("--file", required=False, default="", help="Data file to read")
 
     args = parser.parse_args()
 
@@ -135,7 +138,6 @@ def cli():
             mode=args.mode,
             dry_run=args.dry_run,
         )
-
     elif args.command == "list":
         config_dir = Path(args.dir).resolve()
         toml_files = list(config_dir.glob("*.toml"))
@@ -145,10 +147,12 @@ def cli():
             print("Available configurations:")
             for f in toml_files:
                 print(f"  - {f.resolve()}")
-
     elif args.command == "validate":
         load_pipeline_config(path=Path(args.config))
         print(f"Successfully validated config file: {args.config}")
+    elif args.command == "read":
+        print(read_input_data(path=Path(args.file)).head())
+        print(f"Successfully loaded file: {Path(args.file)}")
     else:
         parser.print_help()
 
