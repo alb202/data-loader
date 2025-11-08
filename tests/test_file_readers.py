@@ -1,4 +1,4 @@
-from src.utilities.file_readers import read_table, detect_file_type, UnsupportedFileTypeError
+from ..utilities.file_readers import read_table, detect_file_type, UnsupportedFileTypeError
 
 import gzip
 
