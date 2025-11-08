@@ -96,8 +96,8 @@ def compare_signatures(test_signature: Signature, template_signature: Signature)
 
 
 def load_transformer_function(transformer_file: Path, template_file: Path) -> Callable:
-    if not Signature:
-        raise ValueError("Missing signature for transform function")
+    # if not Signature:
+    #     raise ValueError("Missing signature for transform function")
 
     try:
         template_signature = get_signature(
