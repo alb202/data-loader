@@ -1,11 +1,21 @@
 import pandas as pd
 from pathlib import Path
 import csv
-# import struct
-
-# from data_reader import read_table
-from data_loader.read_utilities import validate_file
 from pandas import DataFrame
+
+
+def validate_path(path: str | Path) -> Path:
+    if Path(path).exists():
+        return Path(path)
+
+    raise NotADirectoryError(f"Folder does not exist: {path}")
+
+
+def validate_file(path: str | Path) -> Path:
+    if Path(path).exists():
+        return Path(path)
+
+    raise FileNotFoundError(f"File does not exist: {path}")
 
 
 def read_input_data(path: Path | str) -> DataFrame:
