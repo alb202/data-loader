@@ -1,4 +1,4 @@
-from utilities.object_loader import load_object_from_file
+from data_loader.object_loader import load_object_from_file
 
 import pytest
 from pathlib import Path

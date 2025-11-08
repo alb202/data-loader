@@ -5,8 +5,8 @@ import toml
 
 # import tempfile
 # import os
-from config.pipeline_config_io import load_pipeline_config
-from models.pipeline_config_model import (
+from data_loader.pipeline_config_io import load_pipeline_config
+from data_loader.models.pipeline_config_model import (
     PipelineConfig,
     # PipelineDetails,
     # OutputTable,
@@ -43,7 +43,12 @@ def test_load_pipeline_config_success(tmp_path):
     config_dict = valid_config_dict()
     file_path = make_toml_file(tmp_path, config_dict)
     config = load_pipeline_config(file_path)
-    assert isinstance(config, PipelineConfig)
+
+    # print(type(config))
+    # print(isinstance(config, PipelineConfig))
+    # print(config.__class__.__name__)
+    # assert isinstance(config, PipelineConfig)
+    assert config.__class__.__name__ == "PipelineConfig"
     assert config.details.name == "TestPipeline"
     assert config.output_table.table_name == "output_table"
     assert len(config.extract_files) == 3

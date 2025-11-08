@@ -1,9 +1,12 @@
 import inspect
 import pytest
-from inspect import Parameter, Signature
-from src.utilities.transformer_loader import get_signature, compare_signatures, load_transformer_function, ParameterMismatchError
 from pathlib import Path
+
+from inspect import Parameter, Signature
+from data_loader.transformer_loader import get_signature, compare_signatures, load_transformer_function, ParameterMismatchError
 # import from src.utilities.transformer_loader
+
+TRANSFORMER_LOADER_PATH = "data_loader.transformer_loader"
 
 
 def test_get_signature_simple_function():
@@ -111,7 +114,7 @@ def test_load_transformer_function_success(monkeypatch):
             return transformer_transform
         raise ValueError("not found")
 
-    monkeypatch.setattr("src.utilities.transformer_loader.load_object_from_file", mock_loader)
+    monkeypatch.setattr(TRANSFORMER_LOADER_PATH + ".load_object_from_file", mock_loader)
 
     result = load_transformer_function(Path("/path/transformer.py"), Path("/path/template.py"))
     assert result is transformer_transform
@@ -131,7 +134,7 @@ def test_load_transformer_function_parameter_mismatch(monkeypatch):
             return transformer_transform
         raise ValueError("not found")
 
-    monkeypatch.setattr("src.utilities.transformer_loader.load_object_from_file", mock_loader)
+    monkeypatch.setattr(TRANSFORMER_LOADER_PATH + ".load_object_from_file", mock_loader)
 
     with pytest.raises(ParameterMismatchError):
         load_transformer_function(Path("/path/transformer.py"), Path("/path/template.py"))
@@ -143,7 +146,7 @@ def test_load_transformer_function_template_load_error(monkeypatch):
             raise ValueError("template load failed")
         return lambda: None
 
-    monkeypatch.setattr("src.utilities.transformer_loader.load_object_from_file", mock_loader)
+    monkeypatch.setattr(TRANSFORMER_LOADER_PATH + ".load_object_from_file", mock_loader)
 
     with pytest.raises(ValueError, match="Unable to load the signature template"):
         load_transformer_function(Path("/path/transformer.py"), Path("/path/template.py"))
@@ -160,14 +163,14 @@ def test_load_transformer_function_transformer_load_error(monkeypatch):
             raise ValueError("transformer load failed")
         raise ValueError("not found")
 
-    monkeypatch.setattr("src.utilities.transformer_loader.load_object_from_file", mock_loader)
+    monkeypatch.setattr(TRANSFORMER_LOADER_PATH + ".load_object_from_file", mock_loader)
 
     with pytest.raises(ValueError, match="Unable to load the transformer function"):
         load_transformer_function(Path("/path/transformer.py"), Path("/path/template.py"))
 
 
 def test_missing_signature_raises(monkeypatch):
-    monkeypatch.setattr("src.utilities.transformer_loader.Signature", None)
+    monkeypatch.setattr(TRANSFORMER_LOADER_PATH + ".Signature", None)
 
     with pytest.raises(ValueError, match="Missing signature for transform function"):
         load_transformer_function(Path("/path/transformer.py"), Path("/path/template.py"))

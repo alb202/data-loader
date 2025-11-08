@@ -1,10 +1,10 @@
-from logger.logging_utilties import setup_logger, get_timestamp
-from config.pipeline_config_io import load_pipeline_config  # , #load_config
-from extract.read_data import read_input_data
-from utilities.object_loader import load_object_from_file
+from logging_utilties import setup_logger, get_timestamp
+from pipeline_config_io import load_pipeline_config  # , #load_config
+from file_type_readers import read_input_data
+from object_loader import load_object_from_file
+from transformer_loader import load_transformer_function
+from data_writer import DataFrameWriter
 from models.extract_pipeline_data_model import ExtractPipelineData
-from utilities.transformer_loader import load_transformer_function
-from data_writer.writer import DataFrameWriter
 
 import argparse
 from pathlib import Path
@@ -13,7 +13,7 @@ from pathlib import Path
 SAVE_METHODS = ["parquet", "duckdb", "sqlite", "tsv", "csv"]
 MODES = ["append", "overwrite"]
 DEFAULT_PATHS = {
-    "signature_model": "src/models/default_signature_model.py",
+    "signature_model": "src/data_loader/models/default_signature_model.py",
 }
 
 

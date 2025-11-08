@@ -221,6 +221,12 @@ dependencies = [
     { name = "tzdata" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "pytest" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "annotated-types", specifier = "==0.7.0" },
@@ -263,6 +269,12 @@ requires-dist = [
     { name = "typing-inspect", specifier = "==0.9.0" },
     { name = "typing-inspection", specifier = "==0.4.2" },
     { name = "tzdata", specifier = "==2025.2" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black", specifier = ">=25.9.0" },
+    { name = "pytest", specifier = ">=8.4.2" },
 ]
 
 [[package]]
