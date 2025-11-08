@@ -1,4 +1,4 @@
-from object_loader import load_object_from_file
+from data_loader.object_loader import load_object_from_file
 from pathlib import Path
 from inspect import Signature, Parameter, signature
 from pandas import DataFrame

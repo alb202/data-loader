@@ -4,7 +4,7 @@ import csv
 # import struct
 
 # from data_reader import read_table
-from read_utilities import validate_file
+from data_loader.read_utilities import validate_file
 from pandas import DataFrame
 
 

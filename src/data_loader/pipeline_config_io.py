@@ -1,4 +1,4 @@
-from models.pipeline_config_model import PipelineConfig, PipelineDetails, OutputTable, InputFile
+from data_loader.models.pipeline_config_model import PipelineConfig, PipelineDetails, OutputTable, InputFile
 
 from pathlib import Path
 from dataclasses import asdict
