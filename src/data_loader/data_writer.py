@@ -1,21 +1,8 @@
-# import os
-# import sys
 import duckdb
 import sqlite3
 from pandas import DataFrame
 from pathlib import Path
 from typing import Optional, Union, Literal, Callable, Dict
-
-
-# try:
-#     import pandera as pa
-# except ImportError:
-#     pa = None
-
-
-def create_directory(path: Path) -> None:
-    print(path)
-    path.mkdir(exist_ok=True, parents=True)
 
 
 class DataFrameWriterRegistry:
@@ -63,8 +50,6 @@ class DataFrameWriter:
       - SQLite databases
       - Tab-delimited text files
     and allows dynamic registration of new backends.
-
-    Optionally validates the DataFrame using a Pandera schema before writing.
     """
 
     def __init__(
@@ -75,10 +60,7 @@ class DataFrameWriter:
         db: str,
         table_name: str,
         partition_cols: Optional[list[str]] = None,
-        # schema: DataFrameSchema = None,
         mode: Literal["overwrite", "append"] = "overwrite",
-        # validate: bool = True,
-        # **kwargs,
     ):
         self.df: DataFrame = df
         self.output_path: Path = Path(output_path)
@@ -86,50 +68,26 @@ class DataFrameWriter:
         self.table_name: str = table_name
         self.db: str = db
         self.partition_cols: list[str] = partition_cols or []
-        # self.schema = schema
         self.mode: str = mode
-        # self.validate = validate
-        # self.kwargs = kwargs
 
         # Create output directories if needed
         if self.write_method == "parquet" and not self.output_path.exists():
             self.output_path.mkdir(parents=True, exist_ok=True)
 
-    # -------------------------------
     # Public write method
-    # -------------------------------
     def write(self):
-        """Validate (optional) and write the dataframe using the chosen backend."""
-        # if self.validate and self.schema is not None:
-        #     self._validate_with_pandera()
+        """Write the dataframe using the chosen backend."""
 
         writer_func = DataFrameWriterRegistry.get_writer(self.write_method)
         writer_func(self)  # Pass the instance to the writer function
 
-    # -------------------------------
-    # Schema validation
-    # -------------------------------
-    # def _validate_with_pandera(self):
-    #     # """Validate the dataframe using a Pandera schema, if available."""
-    #     # if pa is None:
-    #     #     raise ImportError("Pandera is not installed. Install it with `pip install pandera`.")
 
-    #     if isinstance(self.schema, DataFrameSchema):
-    #         self.df = self.schema.validate(self.df)
-    #     else:
-    #         raise TypeError("Schema must be a pandera DataFrameSchema")
-
-    #     print("DataFrame validated successfully with Pandera schema.")
-
-
-# ======================================================
-# Default Writer Backends
-# ======================================================
+# Writers
 
 
 @DataFrameWriterRegistry.register("parquet")
 def write_parquet(writer: DataFrameWriter):
-    """Write to partitioned or flat Parquet files."""
+    """Write to partitioned or flat Parquet files"""
     df: DataFrame = writer.df
     partition_cols: list[str] = writer.partition_cols
     db: str = writer.db
@@ -143,7 +101,7 @@ def write_parquet(writer: DataFrameWriter):
 
 @DataFrameWriterRegistry.register("duckdb")
 def write_duckdb(writer: DataFrameWriter):
-    """Write to a DuckDB database."""
+    """Write to a DuckDB database"""
 
     df: DataFrame = writer.df
     output_path: Path = writer.output_path
@@ -171,7 +129,7 @@ def write_duckdb(writer: DataFrameWriter):
 
 @DataFrameWriterRegistry.register("sqlite")
 def write_sqlite(writer: DataFrameWriter):
-    """Write to a SQLite database."""
+    """Write to a SQLite database"""
     df: DataFrame = writer.df
     output_path: Path = writer.output_path
     table_name: str = writer.table_name
@@ -196,13 +154,13 @@ def write_sqlite(writer: DataFrameWriter):
 
 @DataFrameWriterRegistry.register("tsv")
 def write_tsv(writer: DataFrameWriter):
-    """Write to tab-delimited text file."""
+    """Write to tab-delimited text file"""
     df: DataFrame = writer.df
     output_path: Path = writer.output_path
     table_name: str = writer.table_name
     db: str = writer.db
 
-    create_directory(path=(output_path / db))
+    (output_path / db).mkdir(exist_ok=True, parents=True)
 
     file_path: Path = output_path / db / f"{table_name}.tsv"
     mode: str = "a" if writer.mode == "append" and file_path.exists() else "w"
@@ -214,13 +172,13 @@ def write_tsv(writer: DataFrameWriter):
 
 @DataFrameWriterRegistry.register("csv")
 def write_csv(writer: DataFrameWriter):
-    """Write to comma-delimited text file."""
+    """Write to comma-delimited text file"""
     df: DataFrame = writer.df
     output_path: Path = writer.output_path
     table_name: str = writer.table_name
     db: str = writer.db
 
-    create_directory(path=(output_path / db))
+    (output_path / db).mkdir(exist_ok=True, parents=True)
 
     file_path: Path = output_path / db / f"{table_name}.csv"
     mode: str = "a" if writer.mode == "append" and file_path.exists() else "w"
@@ -228,43 +186,3 @@ def write_csv(writer: DataFrameWriter):
 
     df.to_csv(file_path, sep=",", mode=mode, index=False, header=header)
     print(f"Wrote CSV file: {file_path}")
-
-
-# import pandas as pd
-# import pandera as pa
-# from pandera import Column, DataFrameSchema, Check
-# from dataframe_writer import DataFrameWriter, DataFrameWriterRegistry
-
-# # Example schema
-# sales_schema = DataFrameSchema({
-#     "region": Column(str, Check.isin(["US", "CA", "UK"])),
-#     "year": Column(int, Check.ge(2000)),
-#     "sales": Column(float, Check.ge(0))
-# })
-
-# df = pd.DataFrame({
-#     "region": ["US", "CA", "US"],
-#     "year": [2023, 2024, 2025],
-#     "sales": [100.0, 200.5, 300.7]
-# })
-
-# # Write to Parquet
-# DataFrameWriter(
-#     df=df,
-#     output_path="output/parquet_data",
-#     write_method="parquet",
-#     partition_cols=["region"],
-#     schema=sales_schema,
-# ).write()
-
-# # Dynamically check what writers are available
-# print("Available writers:", DataFrameWriterRegistry.available_writers())
-
-# # Add a custom writer dynamically
-# @DataFrameWriterRegistry.register("csv")
-# def write_csv(writer):
-#     writer.df.to_csv(writer.output_path, index=False)
-#     print(f"Wrote CSV to {writer.output_path}")
-
-# # Use the custom writer
-# DataFrameWriter(df, "output/custom.csv", "csv").write()

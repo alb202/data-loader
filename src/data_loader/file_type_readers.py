@@ -5,6 +5,21 @@ from pandas import DataFrame
 
 
 def validate_path(path: str | Path) -> Path:
+    """
+    Validates if a given path exists in the filesystem.
+    Args:
+        path (Union[str, Path]): Path to validate, can be either string or Path object
+    Returns:
+        Path: A Path object representing the validated path
+    Raises:
+        NotADirectoryError: If the provided path does not exist in the filesystem
+    Examples:
+        >>> validate_path("/valid/path")
+        Path("/valid/path")
+        >>> validate_path("/invalid/path")
+        NotADirectoryError: Folder does not exist: /invalid/path
+    """
+
     if Path(path).exists():
         return Path(path)
 
@@ -12,6 +27,17 @@ def validate_path(path: str | Path) -> Path:
 
 
 def validate_file(path: str | Path) -> Path:
+    """Check if file exists and return its path.
+    Validates that the provided file path exists in the filesystem. If the file exists, returns a
+    Path object representing the file. If not, raises a FileNotFoundError.
+    Args:
+        path (Union[str, Path]): The file path to validate, can be string or Path object
+    Returns:
+        Path: A Path object representing the validated file path
+    Raises:
+        FileNotFoundError: If the file does not exist at the specified path
+    """
+
     if Path(path).exists():
         return Path(path)
 

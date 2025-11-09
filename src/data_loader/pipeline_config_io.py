@@ -6,28 +6,38 @@ import toml
 
 
 def save_pipeline_config(config: PipelineConfig, file_name: str, config_folder: Path) -> None:
+    """Saves a pipeline configuration to a TOML file.
+    This function takes a PipelineConfig object and saves it to a TOML file in the specified
+    folder with the given filename.
+    Args:
+        config (PipelineConfig): The pipeline configuration object to save.
+        file_name (str): Name of the file to save the configuration to (without extension).
+        config_folder (Path): Path to the folder where the configuration file will be saved.
+    Returns:
+        None
+    Example:
+        >>> config = PipelineConfig(name="my_pipeline", version="1.0")
+        >>> save_pipeline_config(config, "pipeline1", Path("configs/"))
+        # Creates configs/pipeline1.toml
     """
-    Save a PipelineConfig object to a TOML file in the specified folder
 
-    :param config: The pipeline configuration to save
-    :type config: PipelineConfig
-    :param file_name: Name of the TOML file (without extension)
-    :type file_name: str
-    :param config_folder: Folder where the configuration file will be saved
-    :type config_folder: Path
-    """
     with open(config_folder / f"{file_name}.toml", "w") as f:
         toml.dump(asdict(config), f)
 
 
 def load_pipeline_config(path: Path) -> PipelineConfig:
-    """
-    Load a pipeline configuration from a TOML file and return a PipelineConfig object
-
-    :param path: Path to the TOML configuration file
-    :type path: Path
-    :return: Loaded PipelineConfig object
-    :rtype: PipelineConfig
+    """Loads and validates a pipeline configuration from a TOML file.
+    This function reads a TOML configuration file and constructs a PipelineConfig object
+    containing the pipeline details, output table configuration, and input file specifications.
+    Args:
+        path (Path): Path to the TOML configuration file.
+    Returns:
+        PipelineConfig: A validated pipeline configuration object.
+    Raises:
+        FileNotFoundError: If the specified configuration file does not exist.
+        ValueError: If the configuration file format is invalid or required fields are missing.
+    Example:
+        >>> config = load_pipeline_config(Path("pipeline_config.toml"))
     """
 
     if not path.exists():

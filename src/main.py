@@ -23,13 +23,35 @@ def run_pipeline(
     dry_run: bool = False,
     save_method: str = "parquet",
 ) -> None:
+    """Execute the ETL pipeline based on provided configuration.
+    This function orchestrates the Extract, Transform, Load (ETL) pipeline by:
+    1. Loading and validating the pipeline configuration
+    2. Setting up logging
+    3. Extracting and validating input data files
+    4. Transforming data using provided transformation logic
+    5. Loading data to the specified destination
+    Args:
+        config (str): Path to the pipeline configuration file
+        mode (str, optional): Write mode for output data. Defaults to "append"
+        dry_run (bool, optional): If True, runs pipeline without writing data. Defaults to False
+        save_method (str, optional): Method to save output data. Defaults to "parquet"
+    Raises:
+        ValueError: If there's an error loading the pipeline configuration
+    Returns:
+        None
+    Example:
+        >>> run_pipeline(
+        ...     config="pipeline_config.yaml",
+        ...     mode="overwrite",
+        ...     dry_run=True,
+        ...     save_method="csv"
+        ... )
+    """
+
     try:
         config_dict = load_pipeline_config(path=Path(config))
-        # logger.info("Configuration file successfully loaded.")
-        # logger.info(config_dict)
     except Exception as e:
         print(e)
-        # logger.exception(msg)
         raise ValueError("Error trying to import configuration. Check format and try again.")
 
     logger = setup_logger(
@@ -72,15 +94,6 @@ def run_pipeline(
     transformed_df = func(*[extract_file.data for extract_file in extract_files], output_schema=output_schema)
     transformed_df = output_schema.validate(transformed_df)
 
-    # transformer_class = load_object_from_file(
-    #     folder_name=Path(config_dict.details.project_path).resolve(),
-    #     file_name=config_dict.details.transformer_pipeline + ".py",
-    #     object_name="Transformer",
-    # )
-
-    # transformed_df = transformer_class.transform(*[extract_file.data for extract_file in extract_files], output_schema=output_schema)
-    # transformer_class.validate_output(df=transformed_df, output_schema=output_schema)
-
     # Load
     logger.info(f"Saving data to disk with method: {save_method}")
     logger.info(f"Output location: {config_dict.output_table.output_path}")
@@ -103,7 +116,34 @@ def run_pipeline(
 
 
 def cli():
-    """Command-line interface for data pipeline execution."""
+    """Command Line Interface for the Data Pipeline.
+    This CLI tool provides functionality to run ETL pipelines using TOML configuration files.
+    It supports multiple commands for pipeline execution, configuration management, and data validation.
+    Commands:
+        run: Execute a pipeline with the specified configuration
+            --config: Path to TOML config file
+            --save_method: Method for saving data (default: parquet)
+            --mode: Save mode (default: append)
+            --dry-run: Run validation and transformation only
+        list: Display available TOML configuration files
+            --dir: Directory to search for TOML files (optional)
+        validate: Check the structure of a configuration file
+            --config: Path to configuration file to validate
+        read: Test reading a data file
+            --file: Path to data file to read
+    Returns:
+        None. Output is printed to console.
+    Example:
+        # Run a pipeline
+        python main.py run --config pipeline.toml --save_method csv --mode overwrite
+        # List available configs
+        python main.py list
+        # Validate a config file
+        python main.py validate --config pipeline.toml
+        # Test reading a file
+        python main.py read --file data.csv
+    """
+
     parser = argparse.ArgumentParser(description="Data Pipeline CLI - Run ETL pipelines using TOML configs")
 
     subparsers = parser.add_subparsers(dest="command", help="Subcommands")
@@ -139,14 +179,17 @@ def cli():
             dry_run=args.dry_run,
         )
     elif args.command == "list":
-        config_dir = Path(args.dir).resolve()
-        toml_files = list(config_dir.glob("*.toml"))
-        if not toml_files:
-            print("No TOML configuration files found.")
+        if not args.dir:
+            print("No configuration folder. use --dir to provide a path to configuration files.")
         else:
-            print("Available configurations:")
-            for f in toml_files:
-                print(f"  - {f.resolve()}")
+            config_dir = Path(args.dir).resolve()
+            toml_files = list(config_dir.glob("*.toml"))
+            if not toml_files:
+                print("No TOML configuration files found.")
+            else:
+                print("Available configurations:")
+                for f in toml_files:
+                    print(f"  - {f.resolve()}")
     elif args.command == "validate":
         load_pipeline_config(path=Path(args.config))
         print(f"Successfully validated config file: {args.config}")

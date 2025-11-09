@@ -4,10 +4,6 @@ from inspect import Signature, Parameter, signature
 from pandas import DataFrame
 from typing import Any, Callable
 
-# from typing import Callable  # Union,
-# from inspect import Signature
-# from pandera.pandas import DataFrameSchema
-
 
 class ParameterMismatchError(Exception):
     """Raised when the file type is not recognized or supported."""
@@ -96,8 +92,24 @@ def compare_signatures(test_signature: Signature, template_signature: Signature)
 
 
 def load_transformer_function(transformer_file: Path, template_file: Path) -> Callable:
-    # if not Signature:
-    #     raise ValueError("Missing signature for transform function")
+    """Load and validate a transformer function from a file against a template.
+    This function loads a transformer function from a specified file and validates its signature
+    against a template function signature. Both functions must be named 'transform'.
+    Args:
+        transformer_file (Path): Path to the file containing the transformer function.
+        template_file (Path): Path to the file containing the template function.
+    Returns:
+        Callable: The loaded transformer function if signature validation passes.
+    Raises:
+        ValueError: If either the template or transformer function cannot be loaded.
+        ParameterMismatchError: If the transformer function's signature doesn't match the template.
+    Example:
+        >>> transformer = load_transformer_function(
+        ...     Path("my_transformer.py"),
+        ...     Path("template.py")
+        ... )
+        >>> result = transformer(data)
+    """
 
     try:
         template_signature = get_signature(
